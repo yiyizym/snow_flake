@@ -6,6 +6,18 @@
   <meta name=”viewport” content=”initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0″>
   <title>snow flake</title>
   <link rel="stylesheet" href="css/bootstrap.min.css">
+  <style>
+    /*阻止 safari 输入时自动放大*/
+    input[type='text'],
+    input[type='number'],
+    textarea {
+      font-size: 16px;
+    }
+
+    textarea {
+      overflow-y: hidden;
+    }
+  </style>
   <script src="js/jquery-3.1.1.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
 </head>
@@ -18,13 +30,13 @@
             <div class="panel-heading" role="tab" id="headingOne">
               <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#step-1" aria-expanded="true" aria-controls="step-1">
-                  Step 1
+                  <i>1</i>用一句话总结小说的内容
                 </a>
               </h4>
             </div>
             <div id="step-1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
               <div class="panel-body">
-                content 1
+                <textarea rows="1" ></textarea>
               </div>
             </div>
           </div>
@@ -33,13 +45,19 @@
             <div class="panel-heading" role="tab" id="headingTwo">
               <h4 class="panel-title">
                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-2" aria-expanded="false" aria-controls="step-2">
-                  Step 2
+                  <i>2</i>把上面那句话扩写成一段话
                 </a>
               </h4>
             </div>
             <div id="step-2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
               <div class="panel-body">
-                
+                <div class="hint">
+                  <p> 这段话包含 5 个句子：</p>
+                  <p> 故事开头（1句）</p>
+                  <p> 主角经受的主要磨难（3句）</p>
+                  <p> 以及结尾（1句）</p>
+                </div>
+                <textarea rows="1" ></textarea>
               </div>
             </div>
           </div>
@@ -47,13 +65,25 @@
             <div class="panel-heading" role="tab" id="headingThree">
               <h4 class="panel-title">
                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-3" aria-expanded="false" aria-controls="step-3">
-                  Step 3
+                  <i>3</i>塑造主要人物
                 </a>
               </h4>
             </div>
             <div id="step-3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
               <div class="panel-body">
-                
+                <div class="hint">
+                  <p> 每个主要角色都应该有以下内容：</p>
+                  <ul>
+                    <li>姓名</li>
+                    <li>一句话总结的角色故事情节</li>
+                    <li>角色的动机（偏向于抽象的）</li>
+                    <li>角色的目标（偏向于具体的）</li>
+                    <li>阻碍角色达到目标的事物</li>
+                    <li>角色最终的感悟</li>
+                    <li>一段话总结的角色故事情节</li>
+                  </ul>
+                </div>
+                <textarea rows="1" ></textarea>
               </div>
             </div>
           </div>
@@ -61,13 +91,16 @@
             <div class="panel-heading" role="tab" id="headingThree">
               <h4 class="panel-title">
                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-4" aria-expanded="false" aria-controls="step-4">
-                  Step 4
+                  <i>4</i>扩写上面那段故事梗概
                 </a>
               </h4>
             </div>
             <div id="step-4" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
               <div class="panel-body">
-                
+                <div class="hint">
+                  <p> 将内容扩充成一页：</p>
+                </div>
+                <textarea rows="1" ></textarea>
               </div>
             </div>
           </div>
@@ -75,13 +108,18 @@
               <div class="panel-heading" role="tab" id="headingThree">
                 <h4 class="panel-title">
                   <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-5" aria-expanded="false" aria-controls="step-5">
-                    Step 5
+                    <i>5</i>描述故事的每个角色
                   </a>
                 </h4>
               </div>
               <div id="step-5" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                 <div class="panel-body">
-                  
+                  <div class="hint">
+                    <p> 为每个主要角色写上一页纸的描述 </p>
+                    <p> 为其他重要角色也写上半页描述 </p>
+                    <p> 从每个角色的角度去描述整个故事 </p>
+                  </div>
+                  <textarea rows="1" ></textarea>
                 </div>
               </div>
           </div>
@@ -89,12 +127,16 @@
               <div class="panel-heading" role="tab" id="headingThree">
                 <h4 class="panel-title">
                   <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-6" aria-expanded="false" aria-controls="step-6">
-                    Step 6
+                    <i>6</i>继续扩写故事梗概
                   </a>
                 </h4>
               </div>
               <div id="step-6" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                 <div class="panel-body">
+                  <div class="hint">
+                    <p> 将一页纸的故事概述，扩写成四页 </p>
+                  </div>
+                  <textarea rows="1" ></textarea>
                   
                 </div>
               </div>
@@ -103,12 +145,16 @@
               <div class="panel-heading" role="tab" id="headingThree">
                 <h4 class="panel-title">
                   <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-7" aria-expanded="false" aria-controls="step-7">
-                    Step 7
+                    <i>7</i>完善每个角色的所有资料
                   </a>
                 </h4>
               </div>
               <div id="step-7" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                 <div class="panel-body">
+                  <div class="hint">
+                    <p> 在故事的末尾，角色有了什么样的转变、收获 </p>
+                  </div>
+                  <textarea rows="1" ></textarea>
                   
                 </div>
               </div>
@@ -117,7 +163,8 @@
               <div class="panel-heading" role="tab" id="headingThree">
                 <h4 class="panel-title">
                   <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-8" aria-expanded="false" aria-controls="step-8">
-                    Step 8
+                    <i>8</i>罗列出所有故事场景的概述
+                    
                   </a>
                 </h4>
               </div>
@@ -131,12 +178,17 @@
               <div class="panel-heading" role="tab" id="headingThree">
                 <h4 class="panel-title">
                   <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-9" aria-expanded="false" aria-controls="step-9">
-                    Step 9
+                    <i>9</i>扩写每一条场景
                   </a>
                 </h4>
               </div>
               <div id="step-9" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                 <div class="panel-body">
+                  <div class="hint">
+                    <p> 把每一条场景扩写成一段话 </p>
+                    <p> 要在每一段中出现冲突，如果做不到，就去掉那条场景 </p>
+                  </div>
+                  <textarea rows="1" ></textarea>
                   
                 </div>
               </div>
@@ -145,11 +197,25 @@
               <div class="panel-heading" role="tab" id="headingThree">
                 <h4 class="panel-title">
                   <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-10" aria-expanded="false" aria-controls="step-10">
-                    Step 10
+                    <i>10</i>写初稿
                   </a>
                 </h4>
               </div>
               <div id="step-10" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                <div class="panel-body">
+                  
+                </div>
+              </div>
+          </div>
+          <div class="panel panel-default">
+              <div class="panel-heading" role="tab" id="headingThree">
+                <h4 class="panel-title">
+                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-11" aria-expanded="false" aria-controls="step-11">
+                    <i>11</i>完善作品
+                  </a>
+                </h4>
+              </div>
+              <div id="step-11" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                 <div class="panel-body">
                   
                 </div>
@@ -161,5 +227,15 @@
         
     </div>
   </div>
+  <script>
+    $(function(){
+      // 自动调整 textarea 高度
+      // http://stackoverflow.com/questions/454202/creating-a-textarea-with-auto-resize
+      $('textarea').on('input', function(){
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+      })
+    })
+  </script>
 </body>
 </html>
