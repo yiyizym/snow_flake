@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width">
-  <meta name=”viewport” content=”initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0″>
+  <script src='js/vue.js'></script>
   <title>snow flake</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css">
   <style>
     /*阻止 safari 输入时自动放大*/
     input[type='text'],
@@ -13,229 +11,188 @@
     textarea {
       font-size: 16px;
     }
-
     textarea {
       overflow-y: hidden;
     }
   </style>
-  <script src="js/jquery-3.1.1.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
 </head>
 <body>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingOne">
-              <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#step-1" aria-expanded="true" aria-controls="step-1">
-                  <i>1</i>用一句话总结小说的内容
-                </a>
-              </h4>
-            </div>
-            <div id="step-1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-              <div class="panel-body">
-                <textarea rows="1" ></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingTwo">
-              <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-2" aria-expanded="false" aria-controls="step-2">
-                  <i>2</i>把上面那句话扩写成一段话
-                </a>
-              </h4>
-            </div>
-            <div id="step-2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-              <div class="panel-body">
-                <div class="hint">
-                  <p> 这段话包含 5 个句子：</p>
-                  <p> 故事开头（1句）</p>
-                  <p> 主角经受的主要磨难（3句）</p>
-                  <p> 以及结尾（1句）</p>
-                </div>
-                <textarea rows="1" ></textarea>
-              </div>
-            </div>
-          </div>
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingThree">
-              <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-3" aria-expanded="false" aria-controls="step-3">
-                  <i>3</i>塑造主要人物
-                </a>
-              </h4>
-            </div>
-            <div id="step-3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-              <div class="panel-body">
-                <div class="hint">
-                  <p> 每个主要角色都应该有以下内容：</p>
-                  <ul>
-                    <li>姓名</li>
-                    <li>一句话总结的角色故事情节</li>
-                    <li>角色的动机（偏向于抽象的）</li>
-                    <li>角色的目标（偏向于具体的）</li>
-                    <li>阻碍角色达到目标的事物</li>
-                    <li>角色最终的感悟</li>
-                    <li>一段话总结的角色故事情节</li>
-                  </ul>
-                </div>
-                <textarea rows="1" ></textarea>
-              </div>
-            </div>
-          </div>
-          <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingThree">
-              <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-4" aria-expanded="false" aria-controls="step-4">
-                  <i>4</i>扩写上面那段故事梗概
-                </a>
-              </h4>
-            </div>
-            <div id="step-4" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-              <div class="panel-body">
-                <div class="hint">
-                  <p> 将内容扩充成一页：</p>
-                </div>
-                <textarea rows="1" ></textarea>
-              </div>
-            </div>
-          </div>
-          <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="headingThree">
-                <h4 class="panel-title">
-                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-5" aria-expanded="false" aria-controls="step-5">
-                    <i>5</i>描述故事的每个角色
-                  </a>
-                </h4>
-              </div>
-              <div id="step-5" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                <div class="panel-body">
-                  <div class="hint">
-                    <p> 为每个主要角色写上一页纸的描述 </p>
-                    <p> 为其他重要角色也写上半页描述 </p>
-                    <p> 从每个角色的角度去描述整个故事 </p>
-                  </div>
-                  <textarea rows="1" ></textarea>
-                </div>
-              </div>
-          </div>
-          <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="headingThree">
-                <h4 class="panel-title">
-                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-6" aria-expanded="false" aria-controls="step-6">
-                    <i>6</i>继续扩写故事梗概
-                  </a>
-                </h4>
-              </div>
-              <div id="step-6" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                <div class="panel-body">
-                  <div class="hint">
-                    <p> 将一页纸的故事概述，扩写成四页 </p>
-                  </div>
-                  <textarea rows="1" ></textarea>
-                  
-                </div>
-              </div>
-          </div>
-          <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="headingThree">
-                <h4 class="panel-title">
-                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-7" aria-expanded="false" aria-controls="step-7">
-                    <i>7</i>完善每个角色的所有资料
-                  </a>
-                </h4>
-              </div>
-              <div id="step-7" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                <div class="panel-body">
-                  <div class="hint">
-                    <p> 在故事的末尾，角色有了什么样的转变、收获 </p>
-                  </div>
-                  <textarea rows="1" ></textarea>
-                  
-                </div>
-              </div>
-          </div>
-          <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="headingThree">
-                <h4 class="panel-title">
-                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-8" aria-expanded="false" aria-controls="step-8">
-                    <i>8</i>罗列出所有故事场景的概述
-                    
-                  </a>
-                </h4>
-              </div>
-              <div id="step-8" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                <div class="panel-body">
-                  
-                </div>
-              </div>
-          </div>
-          <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="headingThree">
-                <h4 class="panel-title">
-                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-9" aria-expanded="false" aria-controls="step-9">
-                    <i>9</i>扩写每一条场景
-                  </a>
-                </h4>
-              </div>
-              <div id="step-9" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                <div class="panel-body">
-                  <div class="hint">
-                    <p> 把每一条场景扩写成一段话 </p>
-                    <p> 要在每一段中出现冲突，如果做不到，就去掉那条场景 </p>
-                  </div>
-                  <textarea rows="1" ></textarea>
-                  
-                </div>
-              </div>
-          </div>
-          <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="headingThree">
-                <h4 class="panel-title">
-                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-10" aria-expanded="false" aria-controls="step-10">
-                    <i>10</i>写初稿
-                  </a>
-                </h4>
-              </div>
-              <div id="step-10" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                <div class="panel-body">
-                  
-                </div>
-              </div>
-          </div>
-          <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="headingThree">
-                <h4 class="panel-title">
-                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#step-11" aria-expanded="false" aria-controls="step-11">
-                    <i>11</i>完善作品
-                  </a>
-                </h4>
-              </div>
-              <div id="step-11" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                <div class="panel-body">
-                  
-                </div>
-              </div>
-          </div>
-          
-        </div>
+  <div id="app">
+    <side-nav :steps="steps" :selected="selected" @selected="setSelected"></side-nav>
+    <div>
+      <div class="sec" v-for="(step, index) of steps" v-show="step.num == selected" :key="index">
+        <sec-hint :desc="step.desc" :statistic="step.statistic"></sec-hint>
+        <sec-input :num="index" @update-statistic="updateStatistic"></sec-input>
       </div>
-        
     </div>
   </div>
   <script>
-    $(function(){
-      // 自动调整 textarea 高度
-      // http://stackoverflow.com/questions/454202/creating-a-textarea-with-auto-resize
-      $('textarea').on('input', function(){
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-      })
-    })
+    Vue.component('side-nav', {
+      props: ['steps', 'selected'],
+      template: '\
+        <ul>\
+          <li v-for="step in steps">\
+            <button @click="$emit(\'selected\', step.num)" :class="{ selected : selected == step.num }" >{{ step.num }}</button>\
+          </li>\
+        </ul>\
+      '
+    });
+    Vue.component('sec-hint', {
+      props: ['desc', 'statistic'],
+      template: '\
+        <div>\
+          <p>{{ desc.main }}</p>\
+          <ul>\
+            <li v-for="supplement in desc.supplements" >{{ supplement }}</li>\
+          </ul>\
+          <p>{{statistic.actual}} / {{statistic.expected}}</p>\
+        </div>\
+      '
+    });
+
+    Vue.component('sec-input', {
+      props: ['num'],
+      template: '\
+        <div>\
+          <textarea @input="handleInput"></textarea>\
+        </div>\
+      ',
+      methods: {
+        handleInput: function(event){
+          this.resetHeight(event);
+          this.$emit('update-statistic', this.num, event.target.value.length);
+        },
+        resetHeight: function(event){
+          event.target.style.height = 'auto';
+          event.target.style.height = (event.target.scrollHeight) + 'px';
+        }
+      }
+    });
+    new Vue({
+      el: '#app',
+      data: {
+        steps: [{
+          num: 1,
+          desc: {
+            main: '用一句话总结小说的内容',
+            supplements: ['长度不超过 30 个字']
+          },
+          statistic: {
+            actual: 0,
+            expected: 30
+          }
+        },{
+          num: 2,
+          desc: {
+            main: '把上面那句话扩写成一段话',
+            supplements: ['这段话包含 5 个句子：','故事开头（1句）','主角经受的主要磨难（3句）','以及结尾（1句）']
+          },
+          statistic: {
+            actual: 0,
+            expected: 100
+          }
+        },{
+          num: 3,
+          desc: {
+            main: '塑造主要人物',
+            supplements: ['每个主要角色都应该有以下内容：','姓名','一句话总结的角色故事情节','角色的动机（偏向于抽象的）','角色的目标（偏向于具体的）','阻碍角色达到目标的事物', '角色最终的感悟','一段话总结的角色故事情节']
+          },
+          statistic: {
+            actual: 0,
+            expected: 100
+          }
+        },{
+          num: 4,
+          desc: {
+            main: '扩写上面那段故事梗概',
+            supplements: ['将内容扩充到一页纸（800 字）']
+          },
+          statistic: {
+            actual: 0,
+            expected: 800
+          }
+        },{
+          num: 5,
+          desc: {
+            main: '描述故事的每个角色',
+            supplements: ['为每个主要角色写上一页纸（800 字）的描述','为其他重要角色也写上半页（400 字）描述','从每个角色的角度去描述整个故事']
+          },
+          statistic: {
+            actual: 0,
+            expected: 100
+          }
+        },{
+          num: 6,
+          desc: {
+            main: '继续扩写故事梗概',
+            supplements: ['将一页纸的故事概述，扩写成四页（3200 字）']
+          },
+          statistic: {
+            actual: 0,
+            expected: 3200
+          }
+        },{
+          num: 7,
+          desc: {
+            main: '完善每个角色的所有资料',
+            supplements: ['在故事的末尾，角色有了什么样的转变、收获']
+          },
+          statistic: {
+            actual: 0,
+            expected: 100
+          }
+        },{
+          num: 8,
+          desc: {
+            main: '罗列出所有故事场景的概述',
+            supplements: ['把 3200 字的故事梗概拆分成一幕幕的故事场景','每个场景的信息包含：出场人物、故事、篇幅（大约写多少字）']
+          },
+          statistic: {
+            actual: 0,
+            expected: 100
+          }
+        },{
+          num: 9,
+          desc: {
+            main: '扩写每一条场景',
+            supplements: ['把每一条场景扩写成一段话','要在每一段中出现冲突，如果做不到，就去掉那条场景']
+          },
+          statistic: {
+            actual: 0,
+            expected: 100
+          }
+        },{
+          num: 10,
+          desc: {
+            main: '写初稿',
+            supplements: []
+          },
+          statistic: {
+            actual: 0,
+            expected: 100
+          }
+        },{
+          num: 11,
+          desc: {
+            main: '完善作品',
+            supplements: []
+          },
+          statistic: {
+            actual: 0,
+            expected: 100
+          }
+        }],
+        selected: 1
+      },
+      methods: {
+        setSelected: function(step){
+          this.selected = step;
+        },
+        updateStatistic: function(num, length){
+          this.steps[num]['statistic']['actual'] = length;
+        }
+      }
+    });
   </script>
 </body>
 </html>
