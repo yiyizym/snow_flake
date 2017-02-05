@@ -5,7 +5,7 @@
   <script src='js/vue.js'></script>
   <title>snow flake</title>
   <style>
-    /*阻止 safari 输入时自动放大*/
+    /*阻止在手机上输入时自动放大*/
     input[type='text'],
     input[type='number'],
     textarea {
@@ -22,10 +22,17 @@
     <div>
       <div class="sec" v-for="(step, index) of steps" v-show="step.num == selected" :key="index">
         <sec-hint :desc="step.desc" :statistic="step.statistic"></sec-hint>
-        <sec-input :num="index" @update-statistic="updateStatistic"></sec-input>
+        <sec-input :num="index" @update-statistic="updateStatistic">
+          <template v-if="index == 2">
+            <charactors></charactors>
+          </template>
+        </sec-input>
       </div>
     </div>
   </div>
+  <script type="x-template" id="charactors">
+    <div>charactors</div>
+  </script>
   <script>
     Vue.component('side-nav', {
       props: ['steps', 'selected'],
@@ -54,18 +61,28 @@
       props: ['num'],
       template: '\
         <div>\
-          <textarea @input="handleInput"></textarea>\
+          <slot>\
+            <textarea @input="handleInput"></textarea>\
+          </slot>\
         </div>\
       ',
       methods: {
         handleInput: function(event){
           this.resetHeight(event);
-          this.$emit('update-statistic', this.num, event.target.value.length);
+          this.$emit('update-statistic', this.num, (event.target.value).trim().length);
         },
         resetHeight: function(event){
           event.target.style.height = 'auto';
           event.target.style.height = (event.target.scrollHeight) + 'px';
         }
+      }
+    });
+
+    Vue.component('charactors', {
+      props: ['charactors'],
+      template: '#charactors',
+      methods: {
+        
       }
     });
     new Vue({
@@ -115,7 +132,7 @@
           num: 5,
           desc: {
             main: '描述故事的每个角色',
-            supplements: ['为每个主要角色写上一页纸（800 字）的描述','为其他重要角色也写上半页（400 字）描述','从每个角色的角度去描述整个故事']
+            supplements: ['为每个主要角色写上一页纸（800 字）的描述','为其他重要角色也写上半页（400 字）描述','要从每个角色的角度去描述整个故事']
           },
           statistic: {
             actual: 0,
