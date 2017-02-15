@@ -21,17 +21,44 @@
     <side-nav :steps="steps" :selected="selected" @selected="setSelected"></side-nav>
     <div>
       <div class="sec" v-for="(step, index) of steps" v-show="step.num == selected" :key="index">
-        <sec-hint :desc="step.desc" :statistic="step.statistic"></sec-hint>
-        <sec-input :num="index" @update-statistic="updateStatistic">
-          <template v-if="index == 2">
-            <charactors></charactors>
-          </template>
-        </sec-input>
+        <component :is="step.name" :desc="step.desc"></component>
+        <!--<sec-hint :desc="step.desc" :statistic="step.statistic"></sec-hint>-->
+        <!--<sec-input :num="index" @update-statistic="updateStatistic">-->
+          <!--<template v-if="index == 2">-->
+            <!--<charactors :charactors="step.charactors" v-on:add="addCharactor" v-on:delete="deleteCharactor"></charactors>-->
+          <!--</template>-->
+        <!--</sec-input>-->
       </div>
     </div>
   </div>
+  <script type="x-template" id="one">
+    <div>
+      1
+      {{desc}}
+    </div>
+  </script>
+  <script type="x-template" id="two">
+    <div>
+      2
+      {{desc}}
+    </div>
+  </script>
+  <script type="x-template" id="sec-input">
+    <div>
+      <slot>
+        <textarea @input="handleInput"></textarea>
+      </slot>
+    </div>
+  </script>
   <script type="x-template" id="charactors">
-    <div>charactors</div>
+    <div>
+      <button v-on:click="$emit('add')">新增</button>
+      <div v-for="(charactor, index) in charactors" :key="index">
+        <span>name: <input type="text" v-model="charactor.name"></span>
+        <span>age: <input type="text" v-model="charactor.age"></span>
+        <button v-on:click="$emit('delete', index)">删除</button>
+      </div>
+    </div>
   </script>
   <script>
     Vue.component('side-nav', {
@@ -52,20 +79,14 @@
           <ul>\
             <li v-for="supplement in desc.supplements" >{{ supplement }}</li>\
           </ul>\
-          <p>{{statistic.actual}} / {{statistic.expected}}</p>\
+          <p v-if="statistic.expected">{{statistic.actual}} / {{statistic.expected}}</p>\
         </div>\
       '
     });
 
     Vue.component('sec-input', {
       props: ['num'],
-      template: '\
-        <div>\
-          <slot>\
-            <textarea @input="handleInput"></textarea>\
-          </slot>\
-        </div>\
-      ',
+      template: '#sec-input',
       methods: {
         handleInput: function(event){
           this.resetHeight(event);
@@ -82,14 +103,25 @@
       props: ['charactors'],
       template: '#charactors',
       methods: {
-        
       }
     });
+
     new Vue({
       el: '#app',
+      components: {
+        one: {
+          template: '#one',
+          props: ['desc']
+        },
+        two: {
+          template: '#two',
+          props: ['desc']
+        }
+      },
       data: {
         steps: [{
           num: 1,
+          name: 'one',
           desc: {
             main: '用一句话总结小说的内容',
             supplements: ['长度不超过 30 个字']
@@ -100,6 +132,7 @@
           }
         },{
           num: 2,
+          name: 'two',
           desc: {
             main: '把上面那句话扩写成一段话',
             supplements: ['这段话包含 5 个句子：','故事开头（1句）','主角经受的主要磨难（3句）','以及结尾（1句）']
@@ -108,97 +141,112 @@
             actual: 0,
             expected: 100
           }
-        },{
-          num: 3,
-          desc: {
-            main: '塑造主要人物',
-            supplements: ['每个主要角色都应该有以下内容：','姓名','一句话总结的角色故事情节','角色的动机（偏向于抽象的）','角色的目标（偏向于具体的）','阻碍角色达到目标的事物', '角色最终的感悟','一段话总结的角色故事情节']
-          },
-          statistic: {
-            actual: 0,
-            expected: 100
-          }
-        },{
-          num: 4,
-          desc: {
-            main: '扩写上面那段故事梗概',
-            supplements: ['将内容扩充到一页纸（800 字）']
-          },
-          statistic: {
-            actual: 0,
-            expected: 800
-          }
-        },{
-          num: 5,
-          desc: {
-            main: '描述故事的每个角色',
-            supplements: ['为每个主要角色写上一页纸（800 字）的描述','为其他重要角色也写上半页（400 字）描述','要从每个角色的角度去描述整个故事']
-          },
-          statistic: {
-            actual: 0,
-            expected: 100
-          }
-        },{
-          num: 6,
-          desc: {
-            main: '继续扩写故事梗概',
-            supplements: ['将一页纸的故事概述，扩写成四页（3200 字）']
-          },
-          statistic: {
-            actual: 0,
-            expected: 3200
-          }
-        },{
-          num: 7,
-          desc: {
-            main: '完善每个角色的所有资料',
-            supplements: ['在故事的末尾，角色有了什么样的转变、收获']
-          },
-          statistic: {
-            actual: 0,
-            expected: 100
-          }
-        },{
-          num: 8,
-          desc: {
-            main: '罗列出所有故事场景的概述',
-            supplements: ['把 3200 字的故事梗概拆分成一幕幕的故事场景','每个场景的信息包含：出场人物、故事、篇幅（大约写多少字）']
-          },
-          statistic: {
-            actual: 0,
-            expected: 100
-          }
-        },{
-          num: 9,
-          desc: {
-            main: '扩写每一条场景',
-            supplements: ['把每一条场景扩写成一段话','要在每一段中出现冲突，如果做不到，就去掉那条场景']
-          },
-          statistic: {
-            actual: 0,
-            expected: 100
-          }
-        },{
-          num: 10,
-          desc: {
-            main: '写初稿',
-            supplements: []
-          },
-          statistic: {
-            actual: 0,
-            expected: 100
-          }
-        },{
-          num: 11,
-          desc: {
-            main: '完善作品',
-            supplements: []
-          },
-          statistic: {
-            actual: 0,
-            expected: 100
-          }
-        }],
+        }
+//        ,{
+//          num: 3,
+//          name: '3',
+//          desc: {
+//            main: '塑造主要人物',
+//            supplements: ['每个主要角色都应该有以下内容：','姓名','一句话总结的角色故事情节','角色的动机（偏向于抽象的）','角色的目标（偏向于具体的）','阻碍角色达到目标的事物', '角色最终的感悟','一段话总结的角色故事情节']
+//          },
+//          statistic: {
+//            actual: 0,
+//            expected: 0
+//          },
+//          charactors: [{
+//            name: '',
+//            age: null
+//          }]
+//        },{
+//          num: 4,
+//          name: '4',
+//          desc: {
+//            main: '扩写上面那段故事梗概',
+//            supplements: ['将内容扩充到一页纸（800 字）']
+//          },
+//          statistic: {
+//            actual: 0,
+//            expected: 800
+//          }
+//        },{
+//          num: 5,
+//          name: '5',
+//          desc: {
+//            main: '描述故事的每个角色',
+//            supplements: ['为每个主要角色写上一页纸（800 字）的描述','为其他重要角色也写上半页（400 字）描述','要从每个角色的角度去描述整个故事']
+//          },
+//          statistic: {
+//            actual: 0,
+//            expected: 100
+//          }
+//        },{
+//          num: 6,
+//          name: '6',
+//          desc: {
+//            main: '继续扩写故事梗概',
+//            supplements: ['将一页纸的故事概述，扩写成四页（3200 字）']
+//          },
+//          statistic: {
+//            actual: 0,
+//            expected: 3200
+//          }
+//        },{
+//          num: 7,
+//          name: '7',
+//          desc: {
+//            main: '完善每个角色的所有资料',
+//            supplements: ['在故事的末尾，角色有了什么样的转变、收获']
+//          },
+//          statistic: {
+//            actual: 0,
+//            expected: 100
+//          }
+//        },{
+//          num: 8,
+//          name: '8',
+//          desc: {
+//            main: '罗列出所有故事场景的概述',
+//            supplements: ['把 3200 字的故事梗概拆分成一幕幕的故事场景','每个场景的信息包含：出场人物、故事、篇幅（大约写多少字）']
+//          },
+//          statistic: {
+//            actual: 0,
+//            expected: 100
+//          }
+//        },{
+//          num: 9,
+//          name: '9',
+//          desc: {
+//            main: '扩写每一条场景',
+//            supplements: ['把每一条场景扩写成一段话','要在每一段中出现冲突，如果做不到，就去掉那条场景']
+//          },
+//          statistic: {
+//            actual: 0,
+//            expected: 100
+//          }
+//        },{
+//          num: 10,
+//          name: '10',
+//          desc: {
+//            main: '写初稿',
+//            supplements: []
+//          },
+//          statistic: {
+//            actual: 0,
+//            expected: 100
+//          }
+//        },{
+//          num: 11,
+//          name: '11',
+//          desc: {
+//            main: '完善作品',
+//            supplements: []
+//          },
+//          statistic: {
+//            actual: 0,
+//            expected: 100
+//          }
+//        }
+],
         selected: 1
       },
       methods: {
@@ -207,7 +255,20 @@
         },
         updateStatistic: function(num, length){
           this.steps[num]['statistic']['actual'] = length;
+        },
+
+        addCharactor: function(){
+          var charactor = {
+            name: '',
+            age: null
+          };
+          this.steps[2]['charactors'].push(charactor);
+        },
+
+        deleteCharactor: function(index){
+          this.steps[2]['charactors'].splice(index, 1);
         }
+
       }
     });
   </script>
