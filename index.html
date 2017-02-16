@@ -21,35 +21,44 @@
     <side-nav :steps="steps" :selected="selected" @selected="setSelected"></side-nav>
     <div>
       <div class="sec" v-for="(step, index) of steps" v-show="step.num == selected" :key="index">
-        <component :is="step.name" :desc="step.desc"></component>
-        <!--<sec-hint :desc="step.desc" :statistic="step.statistic"></sec-hint>-->
-        <!--<sec-input :num="index" @update-statistic="updateStatistic">-->
-          <!--<template v-if="index == 2">-->
-            <!--<charactors :charactors="step.charactors" v-on:add="addCharactor" v-on:delete="deleteCharactor"></charactors>-->
-          <!--</template>-->
-        <!--</sec-input>-->
+        <component
+          :is="step.name"
+          :desc="step.desc"
+          :statistic="step.statistic"
+          :content="step.content"
+          :num="index"
+          @update-statistic="updateStatistic"
+          @update-content="updateContent"
+        >
+        </component>
       </div>
     </div>
   </div>
+
   <script type="x-template" id="one">
     <div>
-      1
-      {{desc}}
+      <hint :desc="desc" :statistic="statistic"></hint>
+      <textarea @input="handleInput" v-model="innerContent"></textarea>
     </div>
   </script>
+
   <script type="x-template" id="two">
     <div>
-      2
-      {{desc}}
+      <hint :desc="desc" :statistic="statistic"></hint>
+      <textarea @input="handleInput" v-model="innerContent"></textarea>
     </div>
   </script>
-  <script type="x-template" id="sec-input">
+
+  <script type="x-template" id="hint">
     <div>
-      <slot>
-        <textarea @input="handleInput"></textarea>
-      </slot>
+      <p>{{ desc.main }}</p>
+      <ul>
+        <li v-for="supplement in desc.supplements" >{{ supplement }}</li>
+      </ul>
+      <p v-if="statistic.expected">{{statistic.actual}} / {{statistic.expected}}</p>
     </div>
   </script>
+
   <script type="x-template" id="charactors">
     <div>
       <button v-on:click="$emit('add')">新增</button>
@@ -60,6 +69,7 @@
       </div>
     </div>
   </script>
+
   <script>
     Vue.component('side-nav', {
       props: ['steps', 'selected'],
@@ -71,32 +81,9 @@
         </ul>\
       '
     });
-    Vue.component('sec-hint', {
+    Vue.component('hint', {
       props: ['desc', 'statistic'],
-      template: '\
-        <div>\
-          <p>{{ desc.main }}</p>\
-          <ul>\
-            <li v-for="supplement in desc.supplements" >{{ supplement }}</li>\
-          </ul>\
-          <p v-if="statistic.expected">{{statistic.actual}} / {{statistic.expected}}</p>\
-        </div>\
-      '
-    });
-
-    Vue.component('sec-input', {
-      props: ['num'],
-      template: '#sec-input',
-      methods: {
-        handleInput: function(event){
-          this.resetHeight(event);
-          this.$emit('update-statistic', this.num, (event.target.value).trim().length);
-        },
-        resetHeight: function(event){
-          event.target.style.height = 'auto';
-          event.target.style.height = (event.target.scrollHeight) + 'px';
-        }
-      }
+      template: '#hint'
     });
 
     Vue.component('charactors', {
@@ -111,11 +98,43 @@
       components: {
         one: {
           template: '#one',
-          props: ['desc']
+          props: ['desc', 'statistic', 'num', 'content'],
+          data: function(){
+            return {
+              innerContent: this.content
+            }
+          },
+          methods: {
+            handleInput: function(event){
+              this.resetHeight(event);
+              this.$emit('update-content', this.num, (this.innerContent).trim());
+              this.$emit('update-statistic', this.num, (this.innerContent).trim().length);
+            },
+            resetHeight: function(event){
+              event.target.style.height = 'auto';
+              event.target.style.height = (event.target.scrollHeight) + 'px';
+            }
+          }
         },
         two: {
           template: '#two',
-          props: ['desc']
+          props: ['desc', 'statistic', 'num', 'content'],
+          data: function(){
+            return {
+              innerContent: this.content
+            }
+          },
+          methods: {
+            handleInput: function(event){
+              this.resetHeight(event);
+              this.$emit('update-content', this.num, (this.innerContent).trim());
+              this.$emit('update-statistic', this.num, (this.innerContent).trim().length);
+            },
+            resetHeight: function(event){
+              event.target.style.height = 'auto';
+              event.target.style.height = (event.target.scrollHeight) + 'px';
+            }
+          }
         }
       },
       data: {
@@ -129,7 +148,8 @@
           statistic: {
             actual: 0,
             expected: 30
-          }
+          },
+          content: ''
         },{
           num: 2,
           name: 'two',
@@ -140,7 +160,8 @@
           statistic: {
             actual: 0,
             expected: 100
-          }
+          },
+          content: ''
         }
 //        ,{
 //          num: 3,
@@ -255,6 +276,10 @@
         },
         updateStatistic: function(num, length){
           this.steps[num]['statistic']['actual'] = length;
+        },
+
+        updateContent: function(num, content){
+          this.steps[num]['content'] = content;
         },
 
         addCharactor: function(){
