@@ -19,7 +19,6 @@
 <body>
   <div id="app">
     <side-nav :steps="steps" :selected="selected" @selected="setSelected"></side-nav>
-
     <div>
       <div class="sec" v-for="(step, index) of steps" v-show="index == selected" :key="index">
         <component
@@ -36,17 +35,15 @@
     </div>
   </div>
 
-  <script type="x-template" id="one">
+  <script type="x-template" id="type_1">
     <div>
       <hint :desc="desc" :statistic="statistic" :former-content="formerContent"></hint>
-      <textarea @input="handleInput" v-model="innerContent"></textarea>
-    </div>
-  </script>
-
-  <script type="x-template" id="two">
-    <div>
-      <hint :desc="desc" :statistic="statistic" :former-content="formerContent"></hint>
-      <textarea @input="handleInput" v-model="innerContent"></textarea>
+      <customTextarea
+        :index="index"
+        :content="content"
+        :statistic="statistic"
+      >
+      </customTextarea>
     </div>
   </script>
 
@@ -57,17 +54,23 @@
       <ul>
         <li v-for="supplement in desc.supplements" >{{ supplement }}</li>
       </ul>
-      <p v-if="statistic.expected">{{statistic.actual}} / {{statistic.expected}}</p>
+    </div>
+  </script>
+
+  <script type="x-template" id="customTextarea">
+    <div>
+      <p v-if="innerStatistic.expected">{{innerStatistic.actual}} / {{innerStatistic.expected}}</p>
+      <textarea @input="handleInput" v-model="innerContent"></textarea>
     </div>
   </script>
 
   <script type="x-template" id="charactors">
     <div>
-      <button v-on:click="$emit('add')">新增</button>
+      <button @click="$emit('add')">新增</button>
       <div v-for="(charactor, index) in charactors" :key="index">
         <span>name: <input type="text" v-model="charactor.name"></span>
         <span>age: <input type="text" v-model="charactor.age"></span>
-        <button v-on:click="$emit('delete', index)">删除</button>
+        <button @click="$emit('delete', index)">删除</button>
       </div>
     </div>
   </script>
@@ -91,8 +94,29 @@
 
     Vue.component('charactors', {
       props: ['charactors'],
-      template: '#charactors',
+      template: '#charactors'
+    });
+
+    Vue.component('customTextarea', {
+      props: ['index', 'content', 'statistic'],
+      template: '#customTextarea',
+      data: function(){
+        return {
+          innerContent: this.content,
+          innerStatistic: Object.assign({},this.statistic)
+        }
+      },
       methods: {
+        handleInput: function(event){
+          this.resetHeight(event);
+          this.innerStatistic['actual'] = this.innerContent.trim().length;
+          console.log(this.$parent)
+          this.$parent.$emit('update-content', this.index, (this.innerContent).trim());
+        },
+        resetHeight: function(event){
+          event.target.style.height = 'auto';
+          event.target.style.height = (event.target.scrollHeight) + 'px';
+        }
       }
     });
 
@@ -100,11 +124,10 @@
       el: '#app',
       components: {
         one: {
-          template: '#one',
+          template: '#type_1',
           props: ['index', 'content', 'formerContent'],
           data: function(){
             return {
-              innerContent: this.content,
               desc: {
                 main: '用一句话总结小说的内容',
                 supplements: ['长度不超过 30 个字']
@@ -114,25 +137,13 @@
                 expected: 30
               }
             }
-          },
-          methods: {
-            handleInput: function(event){
-              this.statistic['actual'] = (this.innerContent).trim().length;
-              this.resetHeight(event);
-              this.$emit('update-content', this.index, (this.innerContent).trim());
-            },
-            resetHeight: function(event){
-              event.target.style.height = 'auto';
-              event.target.style.height = (event.target.scrollHeight) + 'px';
-            }
           }
         },
         two: {
-          template: '#two',
+          template: '#type_1',
           props: ['index', 'content', 'formerContent'],
           data: function(){
             return {
-              innerContent: this.content,
               desc: {
                 main: '把第 1 步写的话扩写成一段话：',
                 supplements: ['这段话包含 5 个句子：','故事开头（1句）','主角经受的主要磨难（3句）','以及结尾（1句）']
@@ -141,17 +152,6 @@
                 actual: 0,
                 expected: 100
               }
-            }
-          },
-          methods: {
-            handleInput: function(event){
-              this.statistic['actual'] = (this.innerContent).trim().length;
-              this.resetHeight(event);
-              this.$emit('update-content', this.index, (this.innerContent).trim());
-            },
-            resetHeight: function(event){
-              event.target.style.height = 'auto';
-              event.target.style.height = (event.target.scrollHeight) + 'px';
             }
           }
         }
@@ -278,8 +278,9 @@
           this.selected = step;
         },
 
-        updateContent: function(num, content){
-          this.steps[num]['content'] = content;
+        updateContent: function(index, content){
+          console.log(index)
+          this.steps[index]['content'] = content;
         },
 
         addCharactor: function(){
