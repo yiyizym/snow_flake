@@ -36,28 +36,28 @@
     </div>
   </div>
 
-  <script type="x-template" id="type_1">
+  <script type="x-template" id="type-1">
     <div>
       <hint :desc="desc" :statistic="statistic" :former-content="formerContent"></hint>
-      <customTextarea
+      <custom-textarea
         :index="index"
         :content="content"
         :statistic="statistic"
       >
-      </customTextarea>
+      </custom-textarea>
     </div>
   </script>
 
-  <script type="x-template" id="type_2">
+  <script type="x-template" id="type-2">
     <div>
       <hint :desc="desc"></hint>
-      <maincharactors
+      <main-charactors
         :charactors="charactors"
-      ></maincharactors>
+      ></main-charactors>
     </div>
   </script>
 
-  <script type="x-template" id="type_3">
+  <script type="x-template" id="type-3">
     <div>
       <hint :desc="desc"></hint>
       <charactors
@@ -66,7 +66,7 @@
     </div>
   </script>
 
-  <script type="x-template" id="type_4">
+  <script type="x-template" id="type-4">
     <div>
       <hint :desc="desc" :former-content="formerContent"></hint>
       <scenes
@@ -75,12 +75,12 @@
     </div>
   </script>
 
-  <script type="x-template" id="type_5">
+  <script type="x-template" id="type-5">
     <div>
       <hint :desc="desc"></hint>
-      <scenesDetail
+      <scenes-detail
         :scenes="scenes"
-      ></scenesDetail>
+      ></scenes-detail>
     </div>
   </script>
 
@@ -95,14 +95,14 @@
     </div>
   </script>
 
-  <script type="x-template" id="customTextarea">
+  <script type="x-template" id="custom-textarea">
     <div>
       <p v-if="innerStatistic.expected">{{innerStatistic.actual}} / {{innerStatistic.expected}}</p>
       <textarea @input="handleInput" v-model="innerContent"></textarea>
     </div>
   </script>
 
-  <script type="x-template" id="maincharactors">
+  <script type="x-template" id="main-charactors">
     <div>
       <button @click="add">新增</button>
       <div v-for="(charactor, index) in charactors" :key="index">
@@ -151,7 +151,7 @@
     </div>
   </script>
 
-  <script type="x-template" id="scenesDetail">
+  <script type="x-template" id="scenes-detail">
     <div>
       <div v-for="(scene, index) in scenes" :key="index">
         <span>故事情节： <input type="text" v-model="scene.short_story" /></span>
@@ -177,9 +177,9 @@
       template: '#hint'
     });
 
-    Vue.component('maincharactors', {
+    Vue.component('main-charactors', {
       props: ['charactors'],
-      template: '#maincharactors',
+      template: '#main-charactors',
       methods: {
         add: function(){
           this.$root.$emit('add-charactor');
@@ -230,9 +230,9 @@
 
     });
 
-    Vue.component('customTextarea', {
+    Vue.component('custom-textarea', {
       props: ['index', 'content', 'statistic'],
-      template: '#customTextarea',
+      template: '#custom-textarea',
       data: function(){
         return {
           innerContent: this.content,
@@ -252,18 +252,16 @@
       }
     });
 
-
-
-    Vue.component('scenesDetail', {
+    Vue.component('scenes-detail', {
       props: ['scenes'],
-      template: '#scenesDetail'
+      template: '#scenes-detail'
     });
 
     new Vue({
       el: '#app',
       components: {
         one: {
-          template: '#type_1',
+          template: '#type-1',
           props: ['index', 'content', 'formerContent'],
           data: function(){
             return {
@@ -279,7 +277,7 @@
           }
         },
         two: {
-          template: '#type_1',
+          template: '#type-1',
           props: ['index', 'content', 'formerContent'],
           data: function(){
             return {
@@ -295,7 +293,7 @@
           }
         },
         three: {
-          template: '#type_2',
+          template: '#type-2',
           props: ['index', 'charactors'],
           data: function(){
             return {
@@ -307,7 +305,7 @@
           }
         },
         four: {
-          template: '#type_1',
+          template: '#type-1',
           props: ['index', 'content', 'formerContent'],
           data: function(){
             return {
@@ -323,7 +321,7 @@
           }
         },
         five: {
-          template: '#type_3',
+          template: '#type-3',
           props: ['index', 'charactors'],
           data: function(){
             return {
@@ -335,7 +333,7 @@
           }
         },
         six: {
-          template: '#type_1',
+          template: '#type-1',
           props: ['index', 'content', 'formerContent'],
           data: function(){
             return {
@@ -351,7 +349,7 @@
           }
         },
         seven: {
-          template: '#type_3',
+          template: '#type-3',
           props: ['index', 'charactors'],
           data: function(){
             return {
@@ -363,7 +361,7 @@
           }
         },
         eight: {
-          template: '#type_4',
+          template: '#type-4',
           props: ['index', 'scenes', 'formerContent'],
           data: function(){
             return {
@@ -375,7 +373,7 @@
           }
         },
         nine: {
-          template: '#type_5',
+          template: '#type-5',
           props: ['index', 'scenes'],
           data: function(){
             return {
@@ -433,7 +431,6 @@
         },{
           name: 'eight',
           former: 5
-
         },{
           name: 'nine',
           former: -1
