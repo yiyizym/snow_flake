@@ -27,6 +27,7 @@
           :statistic="step.statistic"
           :content="step.content"
           :charactors="charactors"
+          :scenes="scenes"
           :index="index"
           :former-content="step.former > -1 ? steps[step.former]['content'] : null"
         >
@@ -65,6 +66,23 @@
     </div>
   </script>
 
+  <script type="x-template" id="type_4">
+    <div>
+      <hint :desc="desc" :former-content="formerContent"></hint>
+      <scenes
+        :scenes="scenes"
+      ></scenes>
+    </div>
+  </script>
+
+  <script type="x-template" id="type_5">
+    <div>
+      <hint :desc="desc"></hint>
+      <scenesDetail
+        :scenes="scenes"
+      ></scenesDetail>
+    </div>
+  </script>
 
 
   <script type="x-template" id="hint">
@@ -89,6 +107,7 @@
       <button @click="add">新增</button>
       <div v-for="(charactor, index) in charactors" :key="index">
         <span>姓名: <input type="text" v-model="charactor.name"></span>
+        <span>角色类型: <label><input type="radio" name="type" v-model="charactor.type" :value="true">主要角色</label> <label><input type="radio" name="type" v-model="charactor.type" :value="false">次要角色</label></span>
         <span>年龄: <input type="number" v-model="charactor.age"></span>
         <span>一句话故事情节: <input type="text" v-model="charactor.short_story"></span>
         <span>抽象动机: <input type="text" v-model="charactor.abstract_emo"></span>
@@ -105,9 +124,38 @@
     <div>
       <button @click="add">新增</button>
       <div v-for="(charactor, index) in charactors" :key="index">
-        <span>姓名: {{charactor.name}}</span>
-        <span>故事情节: <input type="text" v-model="charactor.story"></span>
+        <span>姓名: <input type="text" v-model="charactor.name"></span>
+        <span>角色类型: <label><input type="radio" name="type" v-model="charactor.type" :value="true">主要角色</label> <label><input type="radio" name="type" v-model="charactor.type" :value="false">次要角色</label></span>
+        <span>年龄: <input type="number" v-model="charactor.age"></span>
+        <span>一句话故事情节: <input type="text" v-model="charactor.short_story"></span>
+        <span>抽象动机: <input type="text" v-model="charactor.abstract_emo"></span>
+        <span>具体动机: <input type="text" v-model="charactor.specific_emo"></span>
+        <span>阻碍: <input type="text" v-model="charactor.obstacle"></span>
+        <span>最终感悟: <input type="text" v-model="charactor.final_thought"></span>
+        <span>一段话故事情节: <input type="text" v-model="charactor.medium_story"></span>
+        <span>总体故事情节: <input type="text" v-model="charactor.long_story"></span>
         <button @click="deleteCharactor(index)">删除</button>
+      </div>
+    </div>
+  </script>
+
+  <script type="x-template" id="scenes">
+    <div>
+      <button @click="add">新增</button>
+      <div v-for="(scene, index) in scenes" :key="index">
+        <span>出场人物： <input type="text" v-model="innerCharactors[index]" @input="addCharactors(index, $event)" placeholder="用空格分隔" /></span>
+        <span>故事情节： <input type="text" v-model="scene.short_story" /></span>
+        <span>预计篇幅： <input type="number" v-model="scene.length" placeholder="写多少字？" /></span>
+        <button @click="deleteScene(index)">删除</button>
+      </div>
+    </div>
+  </script>
+
+  <script type="x-template" id="scenesDetail">
+    <div>
+      <div v-for="(scene, index) in scenes" :key="index">
+        <span>故事情节： <input type="text" v-model="scene.short_story" /></span>
+        <span>完整故事： <input type="text" v-model="scene.long_story" /></span>
       </div>
     </div>
   </script>
@@ -134,10 +182,10 @@
       template: '#maincharactors',
       methods: {
         add: function(){
-          this.$root.$emit('add-maincharactor');
+          this.$root.$emit('add-charactor');
         },
         deleteCharactor: function(index){
-          this.$root.$emit('delete-maincharactor', index);
+          this.$root.$emit('delete-charactor', index);
         }
       }
 
@@ -152,6 +200,31 @@
         },
         deleteCharactor: function(index){
           this.$root.$emit('delete-charactor', index);
+        }
+      }
+
+    });
+
+    Vue.component('scenes', {
+      props: ['scenes'],
+      template: '#scenes',
+      data: function(){
+        return {
+          innerCharactors: this.scenes.map(function(scene){
+            return scene.charactors.join(' ')
+          })
+        }
+      },
+      methods: {
+        add: function(){
+          this.$root.$emit('add-scene');
+        },
+        addCharactors: function(index, e){
+          var charactors = e.target.value.split(' ');
+          this.$root.$emit('add-scene-charactors', index, charactors);
+        },
+        deleteScene: function(index){
+          this.$root.$emit('delete-scene', index);
         }
       }
 
@@ -179,7 +252,14 @@
       }
     });
 
-    var vm = new Vue({
+
+
+    Vue.component('scenesDetail', {
+      props: ['scenes'],
+      template: '#scenesDetail'
+    });
+
+    new Vue({
       el: '#app',
       components: {
         one: {
@@ -242,18 +322,70 @@
             }
           }
         },
-//        five: {
-//          template: '#type_3',
-//          props: ['index', 'mainCharactors', 'charactors'],
-//          data: function(){
-//            return {
-//              desc: {
-//                main: '描述故事的每个角色',
-//                supplements: ['为每个主要角色写上一页纸（800 字）的描述','为其他重要角色也写上半页（400 字）描述','要从每个角色的角度去描述整个故事']
-//              },
-//            }
-//          }
-//        }
+        five: {
+          template: '#type_3',
+          props: ['index', 'charactors'],
+          data: function(){
+            return {
+              desc: {
+                main: '描述故事的每个角色',
+                supplements: ['为每个主要角色写上一页纸（800 字）的描述','为其他重要角色也写上半页（400 字）描述','要从每个角色的角度去描述整个故事']
+              }
+            }
+          }
+        },
+        six: {
+          template: '#type_1',
+          props: ['index', 'content', 'formerContent'],
+          data: function(){
+            return {
+              desc: {
+                main: '继续扩写故事梗概',
+                supplements: ['将一页纸的故事概述，扩写成四页（3200 字）']
+              },
+              statistic: {
+                actual: 0,
+                expected: 3200
+              }
+            }
+          }
+        },
+        seven: {
+          template: '#type_3',
+          props: ['index', 'charactors'],
+          data: function(){
+            return {
+              desc: {
+                main: '完善每个角色的所有资料',
+                supplements: ['在故事的末尾，角色有了什么样的转变、收获']
+              }
+            }
+          }
+        },
+        eight: {
+          template: '#type_4',
+          props: ['index', 'scenes', 'formerContent'],
+          data: function(){
+            return {
+              desc: {
+                main: '罗列出所有故事场景的概述',
+                supplements: ['把 3200 字的故事梗概拆分成一幕幕的故事场景','每个场景的信息包含：出场人物、故事、篇幅（大约写多少字）']
+              }
+            }
+          }
+        },
+        nine: {
+          template: '#type_5',
+          props: ['index', 'scenes'],
+          data: function(){
+            return {
+              desc: {
+                main: '扩写每一条场景',
+                supplements: ['把每一条场景扩写成一段话','要在每一段中出现冲突，如果做不到，就去掉那条场景']
+              }
+            }
+          }
+        }
       },
       data: {
         charactors: [{
@@ -266,6 +398,12 @@
           obstacle: '',
           final_thought: '',
           medium_story: ''
+        }],
+        scenes: [{
+          charactors: [],
+          short_story: '',
+          long_story: '',
+          length: null
         }],
         steps: [{
           name: 'one',
@@ -282,60 +420,26 @@
           name: 'four',
           former: 1,
           content: ''
+        },{
+          name: 'five',
+          former: -1
+        },{
+          name: 'six',
+          former: 3,
+          content: ''
+        },{
+          name: 'seven',
+          former: -1
+        },{
+          name: 'eight',
+          former: 5
+
+        },{
+          name: 'nine',
+          former: -1
         }
-//        ,{
-//          name: 'five',
-//          former: 2,
-//          charactors: [{
-//            name: '',
-//            story: ''
-//          }]
-//        }
+//
 // ,{
-//          num: 6,
-//          name: '6',
-//          desc: {
-//            main: '继续扩写故事梗概',
-//            supplements: ['将一页纸的故事概述，扩写成四页（3200 字）']
-//          },
-//          statistic: {
-//            actual: 0,
-//            expected: 3200
-//          }
-//        },{
-//          num: 7,
-//          name: '7',
-//          desc: {
-//            main: '完善每个角色的所有资料',
-//            supplements: ['在故事的末尾，角色有了什么样的转变、收获']
-//          },
-//          statistic: {
-//            actual: 0,
-//            expected: 100
-//          }
-//        },{
-//          num: 8,
-//          name: '8',
-//          desc: {
-//            main: '罗列出所有故事场景的概述',
-//            supplements: ['把 3200 字的故事梗概拆分成一幕幕的故事场景','每个场景的信息包含：出场人物、故事、篇幅（大约写多少字）']
-//          },
-//          statistic: {
-//            actual: 0,
-//            expected: 100
-//          }
-//        },{
-//          num: 9,
-//          name: '9',
-//          desc: {
-//            main: '扩写每一条场景',
-//            supplements: ['把每一条场景扩写成一段话','要在每一段中出现冲突，如果做不到，就去掉那条场景']
-//          },
-//          statistic: {
-//            actual: 0,
-//            expected: 100
-//          }
-//        },{
 //          num: 10,
 //          name: '10',
 //          desc: {
@@ -364,8 +468,12 @@
 
       mounted: function(){
         this.$on('update-content', this.updateContent);
-        this.$on('add-maincharactor', this.addMainCharactor);
-        this.$on('delete-maincharactor', this.deleteMainCharactor);
+        this.$on('add-charactor', this.addCharactor);
+        this.$on('delete-charactor', this.deleteCharactor);
+
+        this.$on('delete-scene', this.deleteScene);
+        this.$on('add-scene', this.addScene);
+        this.$on('add-scene-charactors', this.addSceneCharactors);
       },
       methods: {
         setSelected: function(step){
@@ -376,11 +484,11 @@
           this.steps[index]['content'] = content;
         },
 
-        addMainCharactor: function(){
+        addCharactor: function(){
           var charactor = {
             name: '',
             age: null,
-            type: 'main',
+            type: null,
             short_story: '',
             abstract_emo: '',
             specific_emo: '',
@@ -392,8 +500,26 @@
           this.charactors.push(charactor);
         },
 
-        deleteMainCharactor: function(index){
+        deleteCharactor: function(index){
           this.charactors.splice(index, 1);
+        },
+
+        addScene: function(){
+          var scene = {
+            charactors: [],
+            short_story: '',
+            long_story: '',
+            length: null
+          };
+          this.scenes.push(scene);
+        },
+
+        deleteScene: function(index){
+          this.scenes.splice(index, 1);
+        },
+
+        addSceneCharactors: function(index, charactors){
+          this.scenes[index]['charactors'] = charactors;
         }
 
       }
