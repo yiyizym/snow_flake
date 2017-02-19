@@ -26,9 +26,9 @@
           :desc="step.desc"
           :statistic="step.statistic"
           :content="step.content"
+          :charactors="charactors"
           :index="index"
           :former-content="step.former > -1 ? steps[step.former]['content'] : null"
-          @update-content="updateContent"
         >
         </component>
       </div>
@@ -47,6 +47,26 @@
     </div>
   </script>
 
+  <script type="x-template" id="type_2">
+    <div>
+      <hint :desc="desc"></hint>
+      <maincharactors
+        :charactors="charactors"
+      ></maincharactors>
+    </div>
+  </script>
+
+  <script type="x-template" id="type_3">
+    <div>
+      <hint :desc="desc"></hint>
+      <charactors
+        :charactors="charactors"
+      ></charactors>
+    </div>
+  </script>
+
+
+
   <script type="x-template" id="hint">
     <div>
       <p>{{ desc.main }}</p>
@@ -64,13 +84,30 @@
     </div>
   </script>
 
+  <script type="x-template" id="maincharactors">
+    <div>
+      <button @click="add">新增</button>
+      <div v-for="(charactor, index) in charactors" :key="index">
+        <span>姓名: <input type="text" v-model="charactor.name"></span>
+        <span>年龄: <input type="number" v-model="charactor.age"></span>
+        <span>一句话故事情节: <input type="text" v-model="charactor.short_story"></span>
+        <span>抽象动机: <input type="text" v-model="charactor.abstract_emo"></span>
+        <span>具体动机: <input type="text" v-model="charactor.specific_emo"></span>
+        <span>阻碍: <input type="text" v-model="charactor.obstacle"></span>
+        <span>最终感悟: <input type="text" v-model="charactor.final_thought"></span>
+        <span>一段话故事情节: <input type="text" v-model="charactor.medium_story"></span>
+        <button @click="deleteCharactor(index)">删除</button>
+      </div>
+    </div>
+  </script>
+
   <script type="x-template" id="charactors">
     <div>
-      <button @click="$emit('add')">新增</button>
+      <button @click="add">新增</button>
       <div v-for="(charactor, index) in charactors" :key="index">
-        <span>name: <input type="text" v-model="charactor.name"></span>
-        <span>age: <input type="text" v-model="charactor.age"></span>
-        <button @click="$emit('delete', index)">删除</button>
+        <span>姓名: {{charactor.name}}</span>
+        <span>故事情节: <input type="text" v-model="charactor.story"></span>
+        <button @click="deleteCharactor(index)">删除</button>
       </div>
     </div>
   </script>
@@ -92,9 +129,32 @@
       template: '#hint'
     });
 
+    Vue.component('maincharactors', {
+      props: ['charactors'],
+      template: '#maincharactors',
+      methods: {
+        add: function(){
+          this.$root.$emit('add-maincharactor');
+        },
+        deleteCharactor: function(index){
+          this.$root.$emit('delete-maincharactor', index);
+        }
+      }
+
+    });
+
     Vue.component('charactors', {
       props: ['charactors'],
-      template: '#charactors'
+      template: '#charactors',
+      methods: {
+        add: function(){
+          this.$root.$emit('add-charactor');
+        },
+        deleteCharactor: function(index){
+          this.$root.$emit('delete-charactor', index);
+        }
+      }
+
     });
 
     Vue.component('customTextarea', {
@@ -110,8 +170,7 @@
         handleInput: function(event){
           this.resetHeight(event);
           this.innerStatistic['actual'] = this.innerContent.trim().length;
-          console.log(this.$parent)
-          this.$parent.$emit('update-content', this.index, (this.innerContent).trim());
+          this.$root.$emit('update-content', this.index, (this.innerContent).trim());
         },
         resetHeight: function(event){
           event.target.style.height = 'auto';
@@ -120,7 +179,7 @@
       }
     });
 
-    new Vue({
+    var vm = new Vue({
       el: '#app',
       components: {
         one: {
@@ -154,9 +213,60 @@
               }
             }
           }
-        }
+        },
+        three: {
+          template: '#type_2',
+          props: ['index', 'charactors'],
+          data: function(){
+            return {
+              desc: {
+                main: '塑造主要人物',
+                supplements: ['每个主要角色都应该有以下内容：','姓名','一句话总结的角色故事情节','角色的动机（偏向于抽象的）','角色的目标（偏向于具体的）','阻碍角色达到目标的事物', '角色最终的感悟','一段话总结的角色故事情节']
+              }
+            }
+          }
+        },
+        four: {
+          template: '#type_1',
+          props: ['index', 'content', 'formerContent'],
+          data: function(){
+            return {
+              desc: {
+                main: '扩写那段故事梗概',
+                supplements: ['将内容扩充到一页纸（800 字）']
+              },
+              statistic: {
+                actual: 0,
+                expected: 800
+              }
+            }
+          }
+        },
+//        five: {
+//          template: '#type_3',
+//          props: ['index', 'mainCharactors', 'charactors'],
+//          data: function(){
+//            return {
+//              desc: {
+//                main: '描述故事的每个角色',
+//                supplements: ['为每个主要角色写上一页纸（800 字）的描述','为其他重要角色也写上半页（400 字）描述','要从每个角色的角度去描述整个故事']
+//              },
+//            }
+//          }
+//        }
       },
       data: {
+        charactors: [{
+          name: '',
+          age: null,
+          type: null,
+          short_story: '',
+          abstract_emo: '',
+          specific_emo: '',
+          obstacle: '',
+          final_thought: '',
+          medium_story: ''
+        }],
         steps: [{
           name: 'one',
           former: -1,
@@ -165,45 +275,23 @@
           name: 'two',
           former: 0,
           content: ''
+        },{
+          name: 'three',
+          former: -1
+        },{
+          name: 'four',
+          former: 1,
+          content: ''
         }
 //        ,{
-//          num: 3,
-//          name: '3',
-//          desc: {
-//            main: '塑造主要人物',
-//            supplements: ['每个主要角色都应该有以下内容：','姓名','一句话总结的角色故事情节','角色的动机（偏向于抽象的）','角色的目标（偏向于具体的）','阻碍角色达到目标的事物', '角色最终的感悟','一段话总结的角色故事情节']
-//          },
-//          statistic: {
-//            actual: 0,
-//            expected: 0
-//          },
+//          name: 'five',
+//          former: 2,
 //          charactors: [{
 //            name: '',
-//            age: null
+//            story: ''
 //          }]
-//        },{
-//          num: 4,
-//          name: '4',
-//          desc: {
-//            main: '扩写上面那段故事梗概',
-//            supplements: ['将内容扩充到一页纸（800 字）']
-//          },
-//          statistic: {
-//            actual: 0,
-//            expected: 800
-//          }
-//        },{
-//          num: 5,
-//          name: '5',
-//          desc: {
-//            main: '描述故事的每个角色',
-//            supplements: ['为每个主要角色写上一页纸（800 字）的描述','为其他重要角色也写上半页（400 字）描述','要从每个角色的角度去描述整个故事']
-//          },
-//          statistic: {
-//            actual: 0,
-//            expected: 100
-//          }
-//        },{
+//        }
+// ,{
 //          num: 6,
 //          name: '6',
 //          desc: {
@@ -273,30 +361,46 @@
 ],
         selected: 0
       },
+
+      mounted: function(){
+        this.$on('update-content', this.updateContent);
+        this.$on('add-maincharactor', this.addMainCharactor);
+        this.$on('delete-maincharactor', this.deleteMainCharactor);
+      },
       methods: {
         setSelected: function(step){
           this.selected = step;
         },
 
         updateContent: function(index, content){
-          console.log(index)
           this.steps[index]['content'] = content;
         },
 
-        addCharactor: function(){
+        addMainCharactor: function(){
           var charactor = {
             name: '',
-            age: null
+            age: null,
+            type: 'main',
+            short_story: '',
+            abstract_emo: '',
+            specific_emo: '',
+            obstacle: '',
+            final_thought: '',
+            medium_story: '',
+            long_story: ''
           };
-          this.steps[2]['charactors'].push(charactor);
+          this.charactors.push(charactor);
         },
 
-        deleteCharactor: function(index){
-          this.steps[2]['charactors'].splice(index, 1);
+        deleteMainCharactor: function(index){
+          this.charactors.splice(index, 1);
         }
 
       }
     });
+
+
+
   </script>
 </body>
 </html>
