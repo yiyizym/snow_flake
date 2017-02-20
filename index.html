@@ -14,6 +14,21 @@
     textarea {
       overflow-y: hidden;
     }
+
+
+    .custom-textarea {
+      position: relative;
+    }
+    .custom-textarea span {
+      position: absolute;
+      right: 0;
+    }
+    .custom-textarea textarea {
+      width: 100%;
+      padding-top: 15px;
+    }
+
+
   </style>
 </head>
 <body>
@@ -24,7 +39,6 @@
         <component
           :is="step.name"
           :desc="step.desc"
-          :statistic="step.statistic"
           :content="step.content"
           :charactors="charactors"
           :scenes="scenes"
@@ -38,11 +52,10 @@
 
   <script type="x-template" id="type-1">
     <div>
-      <hint :desc="desc" :statistic="statistic" :former-content="formerContent"></hint>
+      <hint :desc="desc" :former-content="formerContent"></hint>
       <custom-textarea
         :index="index"
         :content="content"
-        :statistic="statistic"
       >
       </custom-textarea>
     </div>
@@ -96,8 +109,8 @@
   </script>
 
   <script type="x-template" id="custom-textarea">
-    <div>
-      <p v-if="innerStatistic.expected">{{innerStatistic.actual}} / {{innerStatistic.expected}}</p>
+    <div class="custom-textarea">
+      <span>{{wordsCount}}</span>
       <textarea @input="handleInput" v-model="innerContent"></textarea>
     </div>
   </script>
@@ -173,7 +186,7 @@
     });
 
     Vue.component('hint', {
-      props: ['desc', 'statistic' , 'formerContent'],
+      props: ['desc', 'formerContent'],
       template: '#hint'
     });
 
@@ -231,18 +244,18 @@
     });
 
     Vue.component('custom-textarea', {
-      props: ['index', 'content', 'statistic'],
+      props: ['index', 'content'],
       template: '#custom-textarea',
       data: function(){
         return {
           innerContent: this.content,
-          innerStatistic: Object.assign({},this.statistic)
+          wordsCount: this.content ? this.content.trim().length : 0
         }
       },
       methods: {
         handleInput: function(event){
           this.resetHeight(event);
-          this.innerStatistic['actual'] = this.innerContent.trim().length;
+          this.wordsCount = event.target.value.trim().length;
           this.$root.$emit('update-content', this.index, (this.innerContent).trim());
         },
         resetHeight: function(event){
@@ -268,10 +281,6 @@
               desc: {
                 main: '用一句话总结小说的内容',
                 supplements: ['长度不超过 30 个字']
-              },
-              statistic: {
-                actual: 0,
-                expected: 30
               }
             }
           }
@@ -284,10 +293,6 @@
               desc: {
                 main: '把第 1 步写的话扩写成一段话：',
                 supplements: ['这段话包含 5 个句子：','故事开头（1句）','主角经受的主要磨难（3句）','以及结尾（1句）']
-              },
-              statistic: {
-                actual: 0,
-                expected: 100
               }
             }
           }
@@ -312,10 +317,6 @@
               desc: {
                 main: '扩写那段故事梗概',
                 supplements: ['将内容扩充到一页纸（800 字）']
-              },
-              statistic: {
-                actual: 0,
-                expected: 800
               }
             }
           }
@@ -340,10 +341,6 @@
               desc: {
                 main: '继续扩写故事梗概',
                 supplements: ['将一页纸的故事概述，扩写成四页（3200 字）']
-              },
-              statistic: {
-                actual: 0,
-                expected: 3200
               }
             }
           }
@@ -442,10 +439,6 @@
 //          desc: {
 //            main: '写初稿',
 //            supplements: []
-//          },
-//          statistic: {
-//            actual: 0,
-//            expected: 100
 //          }
 //        },{
 //          num: 11,
@@ -453,10 +446,6 @@
 //          desc: {
 //            main: '完善作品',
 //            supplements: []
-//          },
-//          statistic: {
-//            actual: 0,
-//            expected: 100
 //          }
 //        }
 ],
