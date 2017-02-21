@@ -72,6 +72,15 @@ The content `<div>` is where all your content goes.
     color: #888;
 }
 
+.content .content-quote {
+    font-family: "Georgia", serif;
+    color: #666;
+    font-style: italic;
+    line-height: 1.8;
+    border-left: 5px solid #ddd;
+    padding-left: 1.5em;
+}
+
 
 
 /*
@@ -127,8 +136,7 @@ appears on the left side of the page.
     /*
     This styles the selected menu item `<li>`.
     */
-    #menu .pure-menu-selected,
-    #menu .pure-menu-heading {
+    #menu .pure-menu-selected{
         background: #1f8dd6;
     }
         /*
