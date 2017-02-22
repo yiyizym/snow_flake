@@ -48,7 +48,7 @@
       <div id="main">
         <div class="header">
           <h1>Snow flake</h1>
-          <h2>A method help you write better</h2>
+          <h2>help you write better</h2>
         </div>
         <div class="content">
           <div class="sec" v-for="(step, index) of steps" v-show="index == selected" :key="index">
@@ -59,7 +59,7 @@
               :charactors="charactors"
               :scenes="scenes"
               :index="index"
-              :former-content="step.former > -1 ? steps[step.former]['content'] : null"
+              :formercontent="step.former > -1 ? steps[step.former]['content'] : null"
             >
             </component>
           </div>
@@ -70,8 +70,9 @@
 
   <script type="x-template" id="type-1">
     <form class="pure-form">
-      <hint :desc="desc" :index="index" :former-content="formerContent"></hint>
+      <hint :desc="desc" :index="index" :formercontent="formercontent"></hint>
       <custom-textarea
+        :type="'content'"
         :index="index"
         :content="content"
       >
@@ -99,7 +100,7 @@
 
   <script type="x-template" id="type-4">
     <form class="pure-form pure-form-stacked">
-      <hint :desc="desc" :index="index" :former-content="formerContent"></hint>
+      <hint :desc="desc" :index="index" :formercontent="formercontent"></hint>
       <scenes
         :scenes="scenes"
       ></scenes>
@@ -118,8 +119,8 @@
 
   <script type="x-template" id="hint">
     <div>
-      <h2 class="content-subhead">{{index + 1}}.{{ desc.main }}</h2>
-      <blockquote class="content-quote">{{ formerContent }}</blockquote>
+      <h2 class="content-subhead">{{ desc.main }}</h2>
+      <blockquote class="content-quote">{{ formercontent }}</blockquote>
       <p>{{ desc.supplement }}</p>
     </div>
   </script>
@@ -127,7 +128,7 @@
   <script type="x-template" id="custom-textarea">
     <div class="custom-textarea">
       <span>{{wordsCount}}</span>
-      <textarea @input="handleInput" v-model="innerContent"></textarea>
+      <textarea @input="handleInput" :value="innerContent"></textarea>
     </div>
   </script>
 
@@ -137,26 +138,63 @@
         <button @click="add" class="pure-button pure-button-primary" type="button">新增</button>
       </div>
       <div v-for="(charactor, index) in charactors" :key="index" >
-          <label>角色类型: </label>
-          <select v-model="charactor.type">
-            <option v-for="option in options" :value="option.value">
-              {{ option.text }}
-            </option>
-          </select>
-          <label>姓名: </label>
-          <input type="text" v-model="charactor.name">
-          <label>一句话故事情节: </label>
-          <input type="text" v-model="charactor.short_story">
-          <label>抽象动机: </label>
-          <input type="text" v-model="charactor.abstract_emo">
-          <label>具体动机: </label>
-          <input type="text" v-model="charactor.specific_emo">
-          <label>阻碍: </label>
-          <input type="text" v-model="charactor.obstacle">
-          <label>最终感悟: </label>
-          <input type="text" v-model="charactor.final_thought">
-          <label>一段话故事情节: </label>
-          <input type="text" v-model="charactor.medium_story">
+        <label>角色类型: </label>
+        <select v-model="charactor.type">
+          <option v-for="option in options" :value="option.value">
+            {{ option.text }}
+          </option>
+        </select>
+        <label>姓名: </label>
+        <input type="text" v-model="charactor.name">
+        <label>一句话故事情节: </label>
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'short_story'"
+          :content="charactor.short_story"
+        >
+        </custom-textarea>
+
+        <label>抽象动机: </label>
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'abstract_emo'"
+          :content="charactor.abstract_emo"
+        >
+        </custom-textarea>
+        <label>具体动机: </label>
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'specific_emo'"
+          :content="charactor.specific_emo"
+        >
+        </custom-textarea>
+        <label>阻碍: </label>
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'obstacle'"
+          :content="charactor.obstacle"
+        >
+        </custom-textarea>
+        <label>最终感悟: </label>
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'final_thought'"
+          :content="charactor.final_thought"
+        >
+        </custom-textarea>
+        <label>一段话故事情节: </label>
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'medium_story'"
+          :content="charactor.medium_story"
+        >
+        </custom-textarea>
         <div class="pure-controls">
           <button @click="deleteCharactor(index)" class="pure-button" type="button">删除</button>
         </div>
@@ -171,28 +209,71 @@
         <button @click="add" class="pure-button pure-button-primary" type="button">新增</button>
       </div>
       <div v-for="(charactor, index) in charactors" :key="index" >
-        <label>姓名: </label>
-        <input type="text" v-model="charactor.name">
         <label>角色类型: </label>
         <select v-model="charactor.type">
           <option v-for="option in options" :value="option.value">
             {{ option.text }}
           </option>
         </select>
+        <label>姓名: </label>
+        <input type="text" v-model="charactor.name">
         <label>一句话故事情节: </label>
-        <input type="text" v-model="charactor.short_story">
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'short_story'"
+          :content="charactor.short_story"
+        >
+        </custom-textarea>
+
         <label>抽象动机: </label>
-        <input type="text" v-model="charactor.abstract_emo">
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'abstract_emo'"
+          :content="charactor.abstract_emo"
+        >
+        </custom-textarea>
         <label>具体动机: </label>
-        <input type="text" v-model="charactor.specific_emo">
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'specific_emo'"
+          :content="charactor.specific_emo"
+        >
+        </custom-textarea>
         <label>阻碍: </label>
-        <input type="text" v-model="charactor.obstacle">
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'obstacle'"
+          :content="charactor.obstacle"
+        >
+        </custom-textarea>
         <label>最终感悟: </label>
-        <input type="text" v-model="charactor.final_thought">
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'final_thought'"
+          :content="charactor.final_thought"
+        >
+        </custom-textarea>
         <label>一段话故事情节: </label>
-        <input type="text" v-model="charactor.medium_story">
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'medium_story'"
+          :content="charactor.medium_story"
+        >
+        </custom-textarea>
         <label>总体故事情节:</label>
-        <input type="text" v-model="charactor.long_story">
+        <custom-textarea
+          :type="'charactors'"
+          :index="index"
+          :typekey="'long_story'"
+          :content="charactor.long_story"
+        >
+        </custom-textarea>
         <div class="pure-controls">
           <button @click="deleteCharactor(index)" class="pure-button" type="button">删除</button>
         </div>
@@ -205,7 +286,14 @@
       <button @click="add" class="pure-button pure-button-primary" type="button">新增</button>
       <div v-for="(scene, index) in scenes" :key="index">
         <span>出场人物： <input type="text" v-model="innerCharactors[index]" @input="addCharactors(index, $event)" placeholder="用空格分隔" /></span>
-        <span>故事情节： <input type="text" v-model="scene.short_story" /></span>
+        <label>故事情节： </label>
+        <custom-textarea
+          :type="'scenes'"
+          :index="index"
+          :typekey="'short_story'"
+          :content="scene.short_story"
+        >
+        </custom-textarea>
         <span>预计篇幅： <input type="number" v-model="scene.length" placeholder="写多少字？" /></span>
         <button @click="deleteScene(index)" class="pure-button" type="button">删除</button>
       </div>
@@ -215,8 +303,22 @@
   <script type="x-template" id="scenes-detail">
     <div>
       <div v-for="(scene, index) in scenes" :key="index">
-        <span>故事情节： <input type="text" v-model="scene.short_story" /></span>
-        <span>完整故事： <input type="text" v-model="scene.long_story" /></span>
+        <label>故事情节：</label>
+        <custom-textarea
+          :type="'scenes'"
+          :index="index"
+          :typekey="'short_story'"
+          :content="scene.short_story"
+        >
+        </custom-textarea>
+        <label>完整故事：</label>
+        <custom-textarea
+          :type="'scenes'"
+          :index="index"
+          :typekey="'long_story'"
+          :content="scene.long_story"
+        >
+        </custom-textarea>
       </div>
     </div>
   </script>
@@ -254,7 +356,7 @@
     });
 
     Vue.component('hint', {
-      props: ['desc', 'formerContent', 'index'],
+      props: ['desc', 'formercontent', 'index'],
       template: '#hint'
     });
 
@@ -328,19 +430,21 @@
     });
 
     Vue.component('custom-textarea', {
-      props: ['index', 'content'],
+      props: ['type', 'index', 'content', 'typekey'],
       template: '#custom-textarea',
-      data: function(){
-        return {
-          innerContent: this.content,
-          wordsCount: this.content ? this.content.trim().length : 0
+      computed: {
+        innerContent: function(){
+          return this.content;
+        },
+        wordsCount: function(){
+          return this.content ? this.content.trim().length : 0
         }
       },
       methods: {
         handleInput: function(event){
           this.resetHeight(event);
           this.wordsCount = event.target.value.trim().length;
-          this.$root.$emit('update-content', this.index, (this.innerContent).trim());
+          this.$root.$emit('update-data',this.type, this.index, event.target.value.trim(), this.typekey);
         },
         resetHeight: function(event){
           event.target.style.height = 'auto';
@@ -359,7 +463,7 @@
       components: {
         one: {
           template: '#type-1',
-          props: ['index', 'content', 'formerContent'],
+          props: ['index', 'content', 'formercontent'],
           data: function(){
             return {
               desc: {
@@ -371,7 +475,7 @@
         },
         two: {
           template: '#type-1',
-          props: ['index', 'content', 'formerContent'],
+          props: ['index', 'content', 'formercontent'],
           data: function(){
             return {
               desc: {
@@ -395,7 +499,7 @@
         },
         four: {
           template: '#type-1',
-          props: ['index', 'content', 'formerContent'],
+          props: ['index', 'content', 'formercontent'],
           data: function(){
             return {
               desc: {
@@ -419,7 +523,7 @@
         },
         six: {
           template: '#type-1',
-          props: ['index', 'content', 'formerContent'],
+          props: ['index', 'content', 'formercontent'],
           data: function(){
             return {
               desc: {
@@ -443,7 +547,7 @@
         },
         eight: {
           template: '#type-4',
-          props: ['index', 'scenes', 'formerContent'],
+          props: ['index', 'scenes', 'formercontent'],
           data: function(){
             return {
               desc: {
@@ -537,7 +641,7 @@
       },
 
       mounted: function(){
-        this.$on('update-content', this.updateContent);
+        this.$on('update-data', this.updateData);
         this.$on('add-charactor', this.addCharactor);
         this.$on('delete-charactor', this.deleteCharactor);
 
@@ -554,8 +658,22 @@
           this.isactive = !this.isactive;
         },
 
-        updateContent: function(index, content){
-          this.steps[index]['content'] = content;
+        updateData: function(type, index, content, key){
+          switch(type){
+            case 'content': {
+              this.steps[index]['content'] = content;
+              break;
+            }
+            case 'charactors': {
+              this.charactors[index][key] = content;
+              break;
+            }
+            case 'scenes': {
+              this.scenes[index][key] = content;
+              break;
+            }
+          }
+
         },
 
         addCharactor: function(){
@@ -574,7 +692,8 @@
         },
 
         deleteCharactor: function(index){
-          this.charactors.splice(index, 1);
+          var confirm = window.confirm('你确定要删除吗？');
+          confirm && this.charactors.splice(index, 1);
         },
 
         addScene: function(){
@@ -588,13 +707,13 @@
         },
 
         deleteScene: function(index){
-          this.scenes.splice(index, 1);
+          var confirm = window.confirm('你确定要删除吗？');
+          confirm && this.scenes.splice(index, 1);
         },
 
         addSceneCharactors: function(index, charactors){
           this.scenes[index]['charactors'] = charactors;
         }
-
       }
     });
 
