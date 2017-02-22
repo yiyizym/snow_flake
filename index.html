@@ -692,7 +692,8 @@
         },
 
         deleteCharactor: function(index){
-          this.charactors.splice(index, 1);
+          var confirm = window.confirm('你确定要删除吗？');
+          confirm && this.charactors.splice(index, 1);
         },
 
         addScene: function(){
@@ -706,7 +707,8 @@
         },
 
         deleteScene: function(index){
-          this.scenes.splice(index, 1);
+          var confirm = window.confirm('你确定要删除吗？');
+          confirm && this.scenes.splice(index, 1);
         },
 
         addSceneCharactors: function(index, charactors){
