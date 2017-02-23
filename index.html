@@ -39,6 +39,8 @@
 
     .stage-ctn {
       position: relative;
+      margin-top: 10px;
+      border-top: 1px solid #eee;
     }
 
     .with-mode-fade-enter-active,
@@ -49,71 +51,6 @@
     .with-mode-fade-leave-to {
       opacity: 0;
     }
-
-    .to-prev {
-      position: absolute;
-      right: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      border: 1px solid #999;
-      width: 30px;
-      height: 30px;
-      margin-right: 10px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .to-prev::after {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      content: '';
-      width: 10px;
-      height: 10px;
-      border: none;
-      border-left: 1px solid #999;
-      border-bottom: 1px solid #999;
-      transform: translate(-50%, -50%) rotate(45deg);
-
-    }
-
-    .to-prev:hover::after,
-    .to-prev:hover {
-      border-color: #0078e7;
-    }
-
-    .to-next {
-      position: absolute;
-      left: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      border: 1px solid #999;
-      width: 30px;
-      height: 30px;
-      margin-left: 10px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .to-next::after {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      content: '';
-      width: 10px;
-      height: 10px;
-      border: none;
-      border-left: 1px solid #999;
-      border-bottom: 1px solid #999;
-      transform: translate(-50%, -50%) rotate(225deg);
-
-    }
-
-    .to-next:hover::after,
-    .to-next:hover {
-      border-color: #0078e7;
-    }
-
 
   </style>
 </head>
@@ -213,10 +150,10 @@
     <fieldset>
       <div class="pure-controls">
         <button @click="add" class="pure-button pure-button-primary" type="button">新增</button>
+        <button v-show="currentindex != 0" @click="changeindex(-1)" class="pure-button pure-button-primary" type="button">上一条目</button>
+        <button v-show="currentindex != charactors.length - 1" @click="changeindex(1)" class="pure-button pure-button-primary" type="button">下一条目</button>
       </div>
       <div class="stage-ctn">
-        <div v-show="currentindex != 0" @click="changeindex(-1)" class="to-prev"></div>
-        <div v-show="currentindex != charactors.length - 1" @click="changeindex(1)" class="to-next"></div>
         <transition name='with-mode-fade' mode='out-in'>
           <div v-for="(charactor, index) in charactors" v-if="index == currentindex" :key="index" >
             <label>角色类型: </label>
