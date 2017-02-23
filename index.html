@@ -37,6 +37,20 @@
       background: #333;
     }
 
+    .stage-ctn {
+      position: relative;
+      margin-top: 10px;
+      border-top: 1px solid #eee;
+    }
+
+    .with-mode-fade-enter-active,
+    .with-mode-fade-leave-active {
+      transition: opacity .5s;
+    }
+    .with-mode-fade-enter,
+    .with-mode-fade-leave-to {
+      opacity: 0;
+    }
 
   </style>
 </head>
@@ -136,69 +150,77 @@
     <fieldset>
       <div class="pure-controls">
         <button @click="add" class="pure-button pure-button-primary" type="button">新增</button>
+        <button v-show="currentindex != 0" @click="changeindex(-1)" class="pure-button pure-button-primary" type="button">上一条目</button>
+        <button v-show="currentindex != charactors.length - 1" @click="changeindex(1)" class="pure-button pure-button-primary" type="button">下一条目</button>
       </div>
-      <div v-for="(charactor, index) in charactors" :key="index" >
-        <label>角色类型: </label>
-        <select v-model="charactor.type">
-          <option v-for="option in options" :value="option.value">
-            {{ option.text }}
-          </option>
-        </select>
-        <label>姓名: </label>
-        <input type="text" v-model="charactor.name">
-        <label>一句话故事情节: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'short_story'"
-          :content="charactor.short_story"
-        >
-        </custom-textarea>
+      <div class="stage-ctn">
+        <transition name='with-mode-fade' mode='out-in'>
+          <div v-for="(charactor, index) in charactors" v-if="index == currentindex" :key="index" >
+            <label>角色类型: </label>
+            <select v-model="charactor.type">
+              <option v-for="option in options" :value="option.value">
+                {{ option.text }}
+              </option>
+            </select>
+            <label>姓名: </label>
+            <input type="text" v-model="charactor.name">
+            <label>一句话故事情节: </label>
+            <custom-textarea
+              :type="'charactors'"
+              :index="index"
+              :typekey="'short_story'"
+              :content="charactor.short_story"
+            >
+            </custom-textarea>
 
-        <label>抽象动机: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'abstract_emo'"
-          :content="charactor.abstract_emo"
-        >
-        </custom-textarea>
-        <label>具体动机: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'specific_emo'"
-          :content="charactor.specific_emo"
-        >
-        </custom-textarea>
-        <label>阻碍: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'obstacle'"
-          :content="charactor.obstacle"
-        >
-        </custom-textarea>
-        <label>最终感悟: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'final_thought'"
-          :content="charactor.final_thought"
-        >
-        </custom-textarea>
-        <label>一段话故事情节: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'medium_story'"
-          :content="charactor.medium_story"
-        >
-        </custom-textarea>
-        <div class="pure-controls">
-          <button @click="deleteCharactor(index)" class="pure-button" type="button">删除</button>
-        </div>
+            <label>抽象动机: </label>
+            <custom-textarea
+              :type="'charactors'"
+              :index="index"
+              :typekey="'abstract_emo'"
+              :content="charactor.abstract_emo"
+            >
+            </custom-textarea>
+            <label>具体动机: </label>
+            <custom-textarea
+              :type="'charactors'"
+              :index="index"
+              :typekey="'specific_emo'"
+              :content="charactor.specific_emo"
+            >
+            </custom-textarea>
+            <label>阻碍: </label>
+            <custom-textarea
+              :type="'charactors'"
+              :index="index"
+              :typekey="'obstacle'"
+              :content="charactor.obstacle"
+            >
+            </custom-textarea>
+            <label>最终感悟: </label>
+            <custom-textarea
+              :type="'charactors'"
+              :index="index"
+              :typekey="'final_thought'"
+              :content="charactor.final_thought"
+            >
+            </custom-textarea>
+            <label>一段话故事情节: </label>
+            <custom-textarea
+              :type="'charactors'"
+              :index="index"
+              :typekey="'medium_story'"
+              :content="charactor.medium_story"
+            >
+            </custom-textarea>
+            <div class="pure-controls">
+              <button @click="deleteCharactor(index)" class="pure-button" type="button">删除</button>
+            </div>
+          </div>
+        </transition>
+
       </div>
+
     </fieldset>
   </script>
 
@@ -365,6 +387,7 @@
       template: '#main-charactors',
       data: function(){
         return {
+          currentindex: 0,
           options: [
             {text: '主要角色', value: 'major'},
             {text: '次要角色', value: 'minor'}
@@ -374,9 +397,22 @@
       methods: {
         add: function(){
           this.$root.$emit('add-charactor');
+          this.changeindex(this.charactors.length);
         },
         deleteCharactor: function(index){
           this.$root.$emit('delete-charactor', index);
+          this.changeindex(-1);
+        },
+        changeindex: function(count){
+          var maxLength = this.charactors.length;
+          var index = this.currentindex + count;
+          if(index > maxLength - 1){
+            index = maxLength - 1;
+          }
+          else if(index < 0) {
+            index = 0;
+          }
+          this.currentindex = index;
         }
       }
 
@@ -387,6 +423,7 @@
       template: '#charactors',
       data: function(){
         return {
+          currentindex: 0,
           options: [
             {text: '主要角色', value: 'major'},
             {text: '次要角色', value: 'minor'}
@@ -399,6 +436,17 @@
         },
         deleteCharactor: function(index){
           this.$root.$emit('delete-charactor', index);
+        },
+        changeindex: function(count){
+          var maxLength = this.charactors.length;
+          var index = this.currentindex + count;
+          if(index > maxLength - 1){
+            index = maxLength - 1;
+          }
+          else if(index < 0) {
+            index = 0;
+          }
+          this.currentindex = index;
         }
       }
 
