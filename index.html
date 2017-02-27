@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src='js/vue.js'></script>
-  <title>snow flake</title>
+  <title>snow flake, help you write better stories</title>
   <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
   <link rel="stylesheet" href="css/layouts/side-menu.css" >
   <style>
@@ -52,6 +52,12 @@
       opacity: 0;
     }
 
+
+    .scenes-detail {
+      margin-top: 25px;
+      border-top: 1px solid #eeeeee;
+    }
+
   </style>
 </head>
 <body>
@@ -60,10 +66,10 @@
     <div id="layout" :class="{active: isactive}">
       <side-nav :steps="steps" :selected="selected" :isactive="isactive" @selected="setSelected" @togglemenu="togglemenu"></side-nav>
       <div id="main">
-        <div class="header">
-          <h1>Snow flake</h1>
-          <h2>help you write better</h2>
-        </div>
+        <!--<div class="header">-->
+          <!--<h1>Snow flake</h1>-->
+          <!--<h2>help you write better</h2>-->
+        <!--</div>-->
         <div class="content">
           <div class="sec" v-for="(step, index) of steps" v-show="index == selected" :key="index">
             <component
@@ -97,9 +103,10 @@
   <script type="x-template" id="type-2">
     <form class="pure-form pure-form-stacked">
       <hint :desc="desc" :index="index"></hint>
-      <main-charactors
+      <charactors
+        :charactortype="'type-2'"
         :charactors="charactors"
-      ></main-charactors>
+      ></charactors>
     </form>
   </script>
 
@@ -107,12 +114,23 @@
     <form class="pure-form pure-form-stacked">
       <hint :desc="desc" :index="index"></hint>
       <charactors
+        :charactortype="'type-3'"
         :charactors="charactors"
       ></charactors>
     </form>
   </script>
 
   <script type="x-template" id="type-4">
+    <form class="pure-form pure-form-stacked">
+      <hint :desc="desc" :index="index"></hint>
+      <charactors
+        :charactortype="'type-4'"
+        :charactors="charactors"
+      ></charactors>
+    </form>
+  </script>
+
+  <script type="x-template" id="type-5">
     <form class="pure-form pure-form-stacked">
       <hint :desc="desc" :index="index" :formercontent="formercontent"></hint>
       <scenes
@@ -121,7 +139,7 @@
     </form>
   </script>
 
-  <script type="x-template" id="type-5">
+  <script type="x-template" id="type-6">
     <form class="pure-form pure-form-stacked">
       <hint :desc="desc" :index="index"></hint>
       <scenes-detail
@@ -142,190 +160,140 @@
   <script type="x-template" id="custom-textarea">
     <div class="custom-textarea">
       <span>{{wordsCount}}</span>
-      <textarea @input="handleInput" :value="innerContent"></textarea>
+      <textarea @input="handleInput" rows="1" :value="innerContent"></textarea>
     </div>
   </script>
 
-  <script type="x-template" id="main-charactors">
+  <script type="x-template" id="charactors">
     <fieldset>
       <div class="pure-controls">
-        <button @click="add" class="pure-button pure-button-primary" type="button">新增</button>
+        <button v-if="charactortype == 'type-2'" @click="add" class="pure-button pure-button-primary" type="button">新增</button>
         <button v-show="currentindex != 0" @click="changeindex(-1)" class="pure-button pure-button-primary" type="button">上一条目</button>
         <button v-show="currentindex != charactors.length - 1" @click="changeindex(1)" class="pure-button pure-button-primary" type="button">下一条目</button>
       </div>
       <div class="stage-ctn">
         <transition name='with-mode-fade' mode='out-in'>
           <div v-for="(charactor, index) in charactors" v-if="index == currentindex" :key="index" >
-            <label>角色类型: </label>
-            <select v-model="charactor.type">
-              <option v-for="option in options" :value="option.value">
-                {{ option.text }}
-              </option>
-            </select>
-            <label>姓名: </label>
-            <input type="text" v-model="charactor.name">
-            <label>一句话故事情节: </label>
-            <custom-textarea
-              :type="'charactors'"
-              :index="index"
-              :typekey="'short_story'"
-              :content="charactor.short_story"
-            >
-            </custom-textarea>
 
-            <label>抽象动机: </label>
-            <custom-textarea
-              :type="'charactors'"
-              :index="index"
-              :typekey="'abstract_emo'"
-              :content="charactor.abstract_emo"
-            >
-            </custom-textarea>
-            <label>具体动机: </label>
-            <custom-textarea
-              :type="'charactors'"
-              :index="index"
-              :typekey="'specific_emo'"
-              :content="charactor.specific_emo"
-            >
-            </custom-textarea>
-            <label>阻碍: </label>
-            <custom-textarea
-              :type="'charactors'"
-              :index="index"
-              :typekey="'obstacle'"
-              :content="charactor.obstacle"
-            >
-            </custom-textarea>
-            <label>最终感悟: </label>
-            <custom-textarea
-              :type="'charactors'"
-              :index="index"
-              :typekey="'final_thought'"
-              :content="charactor.final_thought"
-            >
-            </custom-textarea>
-            <label>一段话故事情节: </label>
-            <custom-textarea
-              :type="'charactors'"
-              :index="index"
-              :typekey="'medium_story'"
-              :content="charactor.medium_story"
-            >
-            </custom-textarea>
-            <div class="pure-controls">
+            <template v-if="charactortype == 'type-2'">
+
+              <label>角色类型: </label>
+              <select v-model="charactor.type">
+                <option v-for="option in options" :value="option.value">
+                  {{ option.text }}
+                </option>
+              </select>
+              <label>姓名: </label>
+              <input type="text" v-model="charactor.name">
+              <label>一句话故事情节: </label>
+              <custom-textarea
+                :type="'charactors'"
+                :index="index"
+                :typekey="'short_story'"
+                :content="charactor.short_story"
+              >
+              </custom-textarea>
+
+              <label>抽象动机: </label>
+              <custom-textarea
+                :type="'charactors'"
+                :index="index"
+                :typekey="'abstract_emo'"
+                :content="charactor.abstract_emo"
+              >
+              </custom-textarea>
+              <label>具体动机: </label>
+              <custom-textarea
+                :type="'charactors'"
+                :index="index"
+                :typekey="'specific_emo'"
+                :content="charactor.specific_emo"
+              >
+              </custom-textarea>
+              <label>阻碍: </label>
+              <custom-textarea
+                :type="'charactors'"
+                :index="index"
+                :typekey="'obstacle'"
+                :content="charactor.obstacle"
+              >
+              </custom-textarea>
+              <label>最终感悟: </label>
+              <custom-textarea
+                :type="'charactors'"
+                :index="index"
+                :typekey="'final_thought'"
+                :content="charactor.final_thought"
+              >
+              </custom-textarea>
+            </template>
+            <template v-else>
+              <label>姓名: {{charactor.name}}</label>
+              <label>角色类型: {{charactor.text}}</label>
+              <label>一句话角色情节: {{charactor.short_story}}</label>
+              <label>抽象动机: {{charactor.abstract_emo}}</label>
+              <label>具体动机: {{charactor.specific_emo}}</label>
+              <label>阻碍: {{charactor.obstacle}}</label>
+              <label>最终感悟: {{charactor.final_thought}}</label>
+              <label>详细角色情节: </label>
+              <custom-textarea
+                :type="'charactors'"
+                :index="index"
+                :typekey="'long_story'"
+                :content="charactor.long_story"
+              >
+              </custom-textarea>
+              <template v-if="charactortype == 'type-4'">
+                <label>最终改变:</label>
+                <custom-textarea
+                  :type="'charactors'"
+                  :index="index"
+                  :typekey="'change'"
+                  :content="charactor.change"
+                >
+                </custom-textarea>
+              </template>
+            </template>
+            <div v-if="charactortype == 'type-2'" class="pure-controls">
               <button @click="deleteCharactor(index)" class="pure-button" type="button">删除</button>
             </div>
           </div>
         </transition>
-
-      </div>
-
-    </fieldset>
-  </script>
-
-  <script type="x-template" id="charactors">
-
-    <fieldset>
-      <div class="pure-controls">
-        <button @click="add" class="pure-button pure-button-primary" type="button">新增</button>
-      </div>
-      <div v-for="(charactor, index) in charactors" :key="index" >
-        <label>角色类型: </label>
-        <select v-model="charactor.type">
-          <option v-for="option in options" :value="option.value">
-            {{ option.text }}
-          </option>
-        </select>
-        <label>姓名: </label>
-        <input type="text" v-model="charactor.name">
-        <label>一句话故事情节: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'short_story'"
-          :content="charactor.short_story"
-        >
-        </custom-textarea>
-
-        <label>抽象动机: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'abstract_emo'"
-          :content="charactor.abstract_emo"
-        >
-        </custom-textarea>
-        <label>具体动机: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'specific_emo'"
-          :content="charactor.specific_emo"
-        >
-        </custom-textarea>
-        <label>阻碍: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'obstacle'"
-          :content="charactor.obstacle"
-        >
-        </custom-textarea>
-        <label>最终感悟: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'final_thought'"
-          :content="charactor.final_thought"
-        >
-        </custom-textarea>
-        <label>一段话故事情节: </label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'medium_story'"
-          :content="charactor.medium_story"
-        >
-        </custom-textarea>
-        <label>总体故事情节:</label>
-        <custom-textarea
-          :type="'charactors'"
-          :index="index"
-          :typekey="'long_story'"
-          :content="charactor.long_story"
-        >
-        </custom-textarea>
-        <div class="pure-controls">
-          <button @click="deleteCharactor(index)" class="pure-button" type="button">删除</button>
-        </div>
       </div>
     </fieldset>
   </script>
 
   <script type="x-template" id="scenes">
-    <div>
-      <button @click="add" class="pure-button pure-button-primary" type="button">新增</button>
-      <div v-for="(scene, index) in scenes" :key="index">
-        <span>出场人物： <input type="text" v-model="innerCharactors[index]" @input="addCharactors(index, $event)" placeholder="用空格分隔" /></span>
-        <label>故事情节： </label>
-        <custom-textarea
-          :type="'scenes'"
-          :index="index"
-          :typekey="'short_story'"
-          :content="scene.short_story"
-        >
-        </custom-textarea>
-        <span>预计篇幅： <input type="number" v-model="scene.length" placeholder="写多少字？" /></span>
-        <button @click="deleteScene(index)" class="pure-button" type="button">删除</button>
+    <fieldset>
+      <div class="pure-controls">
+        <button @click="add" class="pure-button pure-button-primary" type="button">新增</button>
+        <button v-show="currentindex != 0" @click="changeindex(-1)" class="pure-button pure-button-primary" type="button">上一条目</button>
+        <button v-show="currentindex != scenes.length - 1" @click="changeindex(1)" class="pure-button pure-button-primary" type="button">下一条目</button>
       </div>
-    </div>
+      <div class="stage-ctn">
+        <transition name='with-mode-fade' mode='out-in'>
+          <div v-for="(scene, index) in scenes" v-if="index == currentindex" :key="index">
+            <span>出场人物： <input type="text" v-model="innerCharactors[index]" @input="addCharactors(index, $event)" placeholder="用空格分隔" /></span>
+            <label>故事情节： </label>
+            <custom-textarea
+              :type="'scenes'"
+              :index="index"
+              :typekey="'short_story'"
+              :content="scene.short_story"
+            >
+            </custom-textarea>
+            <span>预计篇幅： <input type="number" v-model="scene.length" placeholder="写多少字？" /></span>
+            <button @click="deleteScene(index)" class="pure-button" type="button">删除</button>
+          </div>
+        </transition>
+      </div>
+    </fieldset>
   </script>
 
   <script type="x-template" id="scenes-detail">
     <div>
-      <div v-for="(scene, index) in scenes" :key="index">
-        <label>故事情节：</label>
+      <div class="scenes-detail" v-for="(scene, index) in scenes" :key="index">
+        <label>场景情节：</label>
         <custom-textarea
           :type="'scenes'"
           :index="index"
@@ -333,7 +301,7 @@
           :content="scene.short_story"
         >
         </custom-textarea>
-        <label>完整故事：</label>
+        <label>完整场景故事：</label>
         <custom-textarea
           :type="'scenes'"
           :index="index"
@@ -382,9 +350,9 @@
       template: '#hint'
     });
 
-    Vue.component('main-charactors', {
-      props: ['charactors'],
-      template: '#main-charactors',
+    Vue.component('charactors', {
+      props: ['charactors', 'charactortype'],
+      template: '#charactors',
       data: function(){
         return {
           currentindex: 0,
@@ -418,45 +386,12 @@
 
     });
 
-    Vue.component('charactors', {
-      props: ['charactors'],
-      template: '#charactors',
-      data: function(){
-        return {
-          currentindex: 0,
-          options: [
-            {text: '主要角色', value: 'major'},
-            {text: '次要角色', value: 'minor'}
-          ]
-        }
-      },
-      methods: {
-        add: function(){
-          this.$root.$emit('add-charactor');
-        },
-        deleteCharactor: function(index){
-          this.$root.$emit('delete-charactor', index);
-        },
-        changeindex: function(count){
-          var maxLength = this.charactors.length;
-          var index = this.currentindex + count;
-          if(index > maxLength - 1){
-            index = maxLength - 1;
-          }
-          else if(index < 0) {
-            index = 0;
-          }
-          this.currentindex = index;
-        }
-      }
-
-    });
-
     Vue.component('scenes', {
       props: ['scenes'],
       template: '#scenes',
       data: function(){
         return {
+          currentindex: 0,
           innerCharactors: this.scenes.map(function(scene){
             return scene.charactors.join(' ')
           })
@@ -465,6 +400,7 @@
       methods: {
         add: function(){
           this.$root.$emit('add-scene');
+          this.changeindex(this.scenes.length);
         },
         addCharactors: function(index, e){
           var charactors = e.target.value.split(' ');
@@ -472,6 +408,18 @@
         },
         deleteScene: function(index){
           this.$root.$emit('delete-scene', index);
+          this.changeindex(-1);
+        },
+        changeindex: function(count){
+          var maxLength = this.scenes.length;
+          var index = this.currentindex + count;
+          if(index > maxLength - 1){
+            index = maxLength - 1;
+          }
+          else if(index < 0) {
+            index = 0;
+          }
+          this.currentindex = index;
         }
       }
 
@@ -540,7 +488,7 @@
             return {
               desc: {
                 main: '塑造主要人物',
-                supplement: '每个主要角色都应该有以下内容：姓名，一句话总结的角色故事情节，角色的动机（偏向于抽象的），角色的目标（偏向于具体的），阻碍角色达到目标的事物，角色最终的感悟，一段话总结的角色故事情节'
+                supplement: '每个主要角色都应该有以下内容：姓名，一句话总结的角色故事情节，角色的动机（偏向于抽象的），角色的目标（偏向于具体的），阻碍角色达到目标的事物，角色最终的感悟'
               }
             }
           }
@@ -551,7 +499,7 @@
           data: function(){
             return {
               desc: {
-                main: '扩写那段故事梗概',
+                main: '扩充第 2 步写的故事梗概',
                 supplement: '将内容扩充到 800 字'
               }
             }
@@ -564,7 +512,7 @@
             return {
               desc: {
                 main: '描述故事的每个角色',
-                supplement: '为每个主要角色写上 800 字的描述，为其他重要角色也写 400 字描述（要从每个角色的角度去描述整个故事）'
+                supplement: '为每个主要角色写上 800 字的描述，为其他重要角色也写 400 字描述'
               }
             }
           }
@@ -575,26 +523,26 @@
           data: function(){
             return {
               desc: {
-                main: '继续扩写故事梗概',
-                supplement: '将一页纸的故事概述，扩写成 3200 字'
+                main: '扩充第 4 步写的故事梗概',
+                supplement: '扩写成 3200 字'
               }
             }
           }
         },
         seven: {
-          template: '#type-3',
+          template: '#type-4',
           props: ['index', 'charactors'],
           data: function(){
             return {
               desc: {
-                main: '完善每个角色的所有资料',
+                main: '完善每个角色的情节，描述角色的最终改变',
                 supplement: '在故事的末尾，角色有了什么样的转变、收获'
               }
             }
           }
         },
         eight: {
-          template: '#type-4',
+          template: '#type-5',
           props: ['index', 'scenes', 'formercontent'],
           data: function(){
             return {
@@ -606,7 +554,7 @@
           }
         },
         nine: {
-          template: '#type-5',
+          template: '#type-6',
           props: ['index', 'scenes'],
           data: function(){
             return {
@@ -627,7 +575,7 @@
           specific_emo: '',
           obstacle: '',
           final_thought: '',
-          medium_story: ''
+          long_story: ''
         }],
         scenes: [{
           charactors: [],
@@ -733,8 +681,8 @@
             specific_emo: '',
             obstacle: '',
             final_thought: '',
-            medium_story: '',
-            long_story: ''
+            long_story: '',
+            change: ''
           };
           this.charactors.push(charactor);
         },
@@ -764,9 +712,6 @@
         }
       }
     });
-
-
-
   </script>
 </body>
 </html>
