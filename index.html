@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src='js/vue.js'></script>
+  <script src="//cdn1.lncld.net/static/js/2.1.0/av-min.js"></script>
   <title>snow flake, help you write better stories</title>
   <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
   <link rel="stylesheet" href="css/layouts/side-menu.css" >
+  <link rel="stylesheet" href="css/modal.css" >
   <style>
     /*阻止在手机上输入时自动放大*/
     input[type='text'],
@@ -66,10 +68,10 @@
     <div id="layout" :class="{active: isactive}">
       <side-nav :steps="steps" :selected="selected" :isactive="isactive" @selected="setSelected" @togglemenu="togglemenu"></side-nav>
       <div id="main">
-        <!--<div class="header">-->
-          <!--<h1>Snow flake</h1>-->
-          <!--<h2>help you write better</h2>-->
-        <!--</div>-->
+        <div class="header">
+          <button class="pure-button pure-button-primary" id="signUp" @click="showSingUpModal = true">注册</button>
+          <button class="pure-button pure-button-primary" id="signIn">登录</button>
+        </div>
         <div class="content">
           <div class="sec" v-for="(step, index) of steps" v-show="index == selected" :key="index">
             <component
@@ -86,6 +88,24 @@
         </div>
       </div>
     </div>
+
+
+    <modal v-if="showSingUpModal">
+      <!--
+        you can use custom content here to overwrite
+        default content
+      -->
+      <h3 slot="header">注册</h3>
+      <form slot="body" class="pure-form pure-form-stacked" v-on:submit.prevent="onSubmit">
+        <label for="username">邮箱：<input required type="email" id="username" v-model="username"></label>
+        <label for="password">密码：<input required type="password" id="password" v-model="password"></label>
+        <div class="pure-controls">
+          <button type="submit" class="pure-button pure-button-primary" >提交</button>
+          <button class="pure-button" @click="showSingUpModal = false">取消</button>
+        </div>
+      </form>
+      <div slot="footer"></div>
+    </modal>
   </div>
 
   <script type="x-template" id="type-1">
@@ -339,7 +359,61 @@
     </div>
   </script>
 
+
+  <!-- template for the modal component -->
+  <script type="text/x-template" id="modal-template">
+    <transition name="modal">
+      <div class="modal-mask">
+        <div class="modal-wrapper">
+          <div class="modal-container">
+
+            <div class="modal-header">
+              <slot name="header">
+                default header
+              </slot>
+            </div>
+
+            <div class="modal-body">
+              <slot name="body">
+                default body
+              </slot>
+            </div>
+
+            <div class="modal-footer">
+              <slot name="footer">
+                default footer
+                <button class="modal-default-button" @click="$emit('close')">
+                  OK
+                </button>
+              </slot>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </script>
+
   <script>
+
+    //TODO 上传到 github 前清空 APP_ID APP_KEY ！！！
+    // 应用 ID，用来识别应用
+    var APP_ID = '';
+
+    // 应用 Key，用来校验权限（Web 端可以配置安全域名来保护数据安全）
+    var APP_KEY = '';
+    //TODO 上传到 github 前清空 APP_ID APP_KEY ！！！
+
+    // 初始化
+    AV.init({
+      appId: APP_ID,
+      appKey: APP_KEY
+    });
+
+    // 浏览器的 Console 中设置 localStorage
+    localStorage.setItem('debug', 'leancloud*');
+
+
+
     Vue.component('side-nav', {
       props: ['steps', 'selected', 'isactive'],
       template: '#side-nav'
@@ -453,6 +527,11 @@
       props: ['scenes'],
       template: '#scenes-detail'
     });
+
+    // register modal component
+    Vue.component('modal', {
+      template: '#modal-template'
+    })
 
     new Vue({
       el: '#app',
@@ -633,7 +712,10 @@
 //        }
 ],
         selected: 0,
-        isactive: false
+        isactive: false,
+        showSingUpModal: false,
+        username: null,
+        password: null
       },
 
       mounted: function(){
@@ -709,6 +791,24 @@
 
         addSceneCharactors: function(index, charactors){
           this.scenes[index]['charactors'] = charactors;
+        },
+
+        onSubmit: function(e){
+          e.preventDefault();
+          // 新建 AVUser 对象实例
+          var user = new AV.User();
+          // 设置用户名
+          user.setUsername(this.username);
+          // 设置邮箱
+          user.setEmail(this.username);
+          // 设置密码
+          user.setPassword(this.password);
+
+          user.signUp().then(function (loginedUser) {
+            console.log(loginedUser);
+          }, function (error) {
+            console.log(error);
+          });
         }
       }
     });
