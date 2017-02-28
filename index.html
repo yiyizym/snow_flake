@@ -69,8 +69,8 @@
       <side-nav :steps="steps" :selected="selected" :isactive="isactive" @selected="setSelected" @togglemenu="togglemenu"></side-nav>
       <div id="main">
         <div class="header">
-          <button class="pure-button pure-button-primary" id="signUp" @click="showSingUpModal = true">注册</button>
-          <button class="pure-button pure-button-primary" id="signIn">登录</button>
+          <button class="pure-button pure-button-primary" @click="showSignUpModal = true">注册</button>
+          <button class="pure-button pure-button-primary" >登录</button>
         </div>
         <div class="content">
           <div class="sec" v-for="(step, index) of steps" v-show="index == selected" :key="index">
@@ -90,22 +90,40 @@
     </div>
 
 
-    <modal v-if="showSingUpModal">
+    <modal v-if="showSignUpModal">
       <!--
         you can use custom content here to overwrite
         default content
       -->
       <h3 slot="header">注册</h3>
-      <form slot="body" class="pure-form pure-form-stacked" v-on:submit.prevent="onSubmit">
-        <label for="username">邮箱：<input required type="email" id="username" v-model="username"></label>
-        <label for="password">密码：<input required type="password" id="password" v-model="password"></label>
+      <form slot="body" class="pure-form pure-form-stacked" v-on:submit.prevent="signUp">
+        <label>邮箱：<input required type="email" ref="signUpUsername"></label>
+        <label>密码：<input required type="password" ref="signUpPassword"></label>
         <div class="pure-controls">
-          <button type="submit" class="pure-button pure-button-primary" >提交</button>
-          <button class="pure-button" @click="showSingUpModal = false">取消</button>
+          <button type="submit" class="pure-button pure-button-primary" >确定</button>
+          <button class="pure-button" @click="showSignUpModal = false">取消</button>
         </div>
       </form>
       <div slot="footer"></div>
     </modal>
+
+    <modal v-if="showSignInModal">
+      <!--
+        you can use custom content here to overwrite
+        default content
+      -->
+      <h3 slot="header">登录</h3>
+      <form slot="body" class="pure-form pure-form-stacked" v-on:submit.prevent="signInFromModal">
+        <label>邮箱：<input required type="email" ref="signInUserName" ></label>
+        <label>密码：<input required type="password" ref="signInPassword" ></label>
+        <div class="pure-controls">
+          <button type="submit" class="pure-button pure-button-primary" >确定</button>
+          <button class="pure-button" @click="showSignInModal = false">取消</button>
+        </div>
+      </form>
+      <div slot="footer"></div>
+    </modal>
+
   </div>
 
   <script type="x-template" id="type-1">
@@ -713,7 +731,9 @@
 ],
         selected: 0,
         isactive: false,
-        showSingUpModal: false,
+        showSignUpModal: false,
+        showSignInModal: false,
+        signIned: false,
         username: null,
         password: null
       },
@@ -793,22 +813,54 @@
           this.scenes[index]['charactors'] = charactors;
         },
 
-        onSubmit: function(e){
+        signUp: function(e){
+          var that = this;
           e.preventDefault();
+          var username = this.$refs.signUpUsername.value;
+          var password = this.$refs.signUpPassword.value;
+          
           // 新建 AVUser 对象实例
           var user = new AV.User();
           // 设置用户名
-          user.setUsername(this.username);
+          user.setUsername(username);
           // 设置邮箱
-          user.setEmail(this.username);
+          user.setEmail(username);
           // 设置密码
-          user.setPassword(this.password);
+          user.setPassword(password);
 
           user.signUp().then(function (loginedUser) {
             console.log(loginedUser);
+            //loginedUser.attributes.username
+            //loginedUser.attributes.email
+            //loginedUser.attributes.emailVerified
+
+            that.showSignUpModal = false;
+            that.signIn(username, password).then(function(loginedUser){
+              that.signIned = true;
+            }, function(error){
+              console.log(error);
+            })
+            
           }, function (error) {
             console.log(error);
           });
+        },
+
+        signInFromModal: function(e){
+          var that = this;
+          e.preventDefault();
+          var username = this.$refs.signInUserName.value;
+          var password = this.$refs.signInPassword.value;
+          signIn(username, password).then(function(loginedUser){
+            that.showSignInModal = false;
+            that.signIned = true;
+          }, function(error){
+            console.log(error);
+          });
+        },
+
+        signIn: function(username, password){
+          return AV.User.logIn(username, password);
         }
       }
     });
