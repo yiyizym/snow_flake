@@ -69,8 +69,14 @@
       <side-nav :steps="steps" :selected="selected" :isactive="isactive" @selected="setSelected" @togglemenu="togglemenu"></side-nav>
       <div id="main">
         <div class="header">
-          <button class="pure-button pure-button-primary" @click="showSignUpModal = true">注册</button>
-          <button class="pure-button pure-button-primary" >登录</button>
+          <template v-if="signIned">
+            <span>你好，{{ username }}</span>
+            <button class="pure-button pure-button-primary" @click="logOut">登出</button>
+          </template>
+          <template v-else>
+            <button class="pure-button pure-button-primary" @click="showSignUpModal = true">注册</button>
+            <button class="pure-button pure-button-primary" @click="showSignInModal = true">登录</button>
+          </template>
         </div>
         <div class="content">
           <div class="sec" v-for="(step, index) of steps" v-show="index == selected" :key="index">
@@ -96,15 +102,26 @@
         default content
       -->
       <h3 slot="header">注册</h3>
-      <form slot="body" class="pure-form pure-form-stacked" v-on:submit.prevent="signUp">
-        <label>邮箱：<input required type="email" ref="signUpUsername"></label>
-        <label>密码：<input required type="password" ref="signUpPassword"></label>
-        <div class="pure-controls">
-          <button type="submit" class="pure-button pure-button-primary" >确定</button>
-          <button class="pure-button" @click="showSignUpModal = false">取消</button>
-        </div>
-      </form>
-      <div slot="footer"></div>
+      <div slot="body">
+        <template v-if="signUped && !emailValidated">
+          <p>请验证邮箱，验证成功后点击“我已验证邮箱，登录”按钮</p>
+          <button class="pure-button pure-button-primary" @click="showSignUpModal = false;showSignInModal = true;">我已验证邮箱，登录</button>
+        </template>
+        <template v-else>
+          <form class="pure-form pure-form-stacked" v-on:submit.prevent="signUp">
+            <label>邮箱：<input required type="email" ref="signUpUsername"></label>
+            <label>密码：<input required type="password" ref="signUpPassword"></label>
+            <div class="pure-controls">
+              <button type="submit" class="pure-button pure-button-primary" >确定</button>
+              <button class="pure-button" @click="showSignUpModal = false">取消</button>
+            </div>
+          </form>
+        </template>
+      </div>
+
+      <div slot="footer">
+        <p>{{signUpErrorMsg}}</p>
+      </div>
     </modal>
 
     <modal v-if="showSignInModal">
@@ -121,7 +138,9 @@
           <button class="pure-button" @click="showSignInModal = false">取消</button>
         </div>
       </form>
-      <div slot="footer"></div>
+      <div slot="footer">
+        <p>{{signInErrorMsg}}</p>
+      </div>
     </modal>
 
   </div>
@@ -549,7 +568,7 @@
     // register modal component
     Vue.component('modal', {
       template: '#modal-template'
-    })
+    });
 
     new Vue({
       el: '#app',
@@ -733,9 +752,37 @@
         isactive: false,
         showSignUpModal: false,
         showSignInModal: false,
+        emailValidated: false,
         signIned: false,
-        username: null,
-        password: null
+        signInErrorMsg: '',
+        signUpErrorMsg: '',
+        errorMap: {
+          1: '登录失败次数超过限制，请稍候再试，或者通过忘记密码重设密码。',
+          203: '邮箱已被占用',
+          210: '邮箱或密码不正确',
+          211: '邮箱未注册',
+          216: '请先验证邮箱'
+        },
+        signUped: false,
+        username: ''
+      },
+
+      created: function(){
+        var that = this;
+        var currentUser = AV.User.current();
+        if(currentUser){
+          currentUser.isAuthenticated().then(function(authenticated){
+            that.signIned = true;
+            that.username = currentUser.attributes.username;
+            that.emailValidated = currentUser.attributes.emailValidated;
+          }, function(error){
+            console.log('SessionToken expired');
+            that.signIned = false;
+          });
+        }
+        else {
+          that.signIned = false;
+        }
       },
 
       mounted: function(){
@@ -829,19 +876,14 @@
           user.setPassword(password);
 
           user.signUp().then(function (loginedUser) {
-            console.log(loginedUser);
-            //loginedUser.attributes.username
-            //loginedUser.attributes.email
-            //loginedUser.attributes.emailVerified
 
-            that.showSignUpModal = false;
-            that.signIn(username, password).then(function(loginedUser){
-              that.signIned = true;
-            }, function(error){
-              console.log(error);
-            })
-            
+            that.signUped = true;
+            that.emailValidated = loginedUser.attributes.emailVerified;
+            that.username = loginedUser.attributes.username;
+            that.signUpErrorMsg = '';
+
           }, function (error) {
+            that.signUpErrorMsg = that.errorMap[error.code];
             console.log(error);
           });
         },
@@ -851,16 +893,27 @@
           e.preventDefault();
           var username = this.$refs.signInUserName.value;
           var password = this.$refs.signInPassword.value;
-          signIn(username, password).then(function(loginedUser){
+          this.signIn(username, password).then(function(loginedUser){
             that.showSignInModal = false;
             that.signIned = true;
+            that.username = loginedUser.attributes.username;
+            that.signInErrorMsg = '';
           }, function(error){
-            console.log(error);
+            that.signInErrorMsg = that.errorMap[error.code];
+//            console.log(error);
           });
         },
 
         signIn: function(username, password){
           return AV.User.logIn(username, password);
+        },
+
+        logOut: function(){
+          var that = this;
+          AV.User.logOut().then(function(){
+            that.signIned = false;
+            that.username = '';
+          })
         }
       }
     });
