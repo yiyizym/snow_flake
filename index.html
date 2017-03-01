@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src='js/vue.js'></script>
+  <script src="js/bluebird.min.js"></script>
   <script src="//cdn1.lncld.net/static/js/2.1.0/av-min.js"></script>
   <title>snow flake, help you write better stories</title>
   <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
@@ -71,7 +72,8 @@
         <div class="header">
           <template v-if="signIned">
             <span>你好，{{ username }}</span>
-            <button class="pure-button pure-button-primary" @click="logOut">登出</button>
+            <button class="pure-button " @click="logOut">登出</button>
+            <button class="pure-button pure-button-primary" @click="saveAll">{{saveButtonMsg}}</button>
           </template>
           <template v-else>
             <button class="pure-button pure-button-primary" @click="showSignUpModal = true">注册</button>
@@ -130,6 +132,7 @@
         default content
       -->
       <h3 slot="header">登录</h3>
+      <p>{{signInErrorMsg}}</p>
       <form slot="body" class="pure-form pure-form-stacked" v-on:submit.prevent="signInFromModal">
         <label>邮箱：<input required type="email" ref="signInUserName" ></label>
         <label>密码：<input required type="password" ref="signInPassword" ></label>
@@ -138,9 +141,7 @@
           <button class="pure-button" @click="showSignInModal = false">取消</button>
         </div>
       </form>
-      <div slot="footer">
-        <p>{{signInErrorMsg}}</p>
-      </div>
+      <div slot="footer"></div>
     </modal>
 
   </div>
@@ -753,10 +754,12 @@
         showSignUpModal: false,
         showSignInModal: false,
         emailValidated: false,
-        signIned: false,
+        isSaving: false,
         signInErrorMsg: '',
         signUpErrorMsg: '',
+
         errorMap: {
+          101: 'Class or object doesn\'t exists.',
           1: '登录失败次数超过限制，请稍候再试，或者通过忘记密码重设密码。',
           203: '邮箱已被占用',
           210: '邮箱或密码不正确',
@@ -764,25 +767,27 @@
           216: '请先验证邮箱'
         },
         signUped: false,
+        userId: null,
         username: ''
+      },
+      computed: {
+        signIned: function(){
+          return this.userId != null;
+        },
+        saveButtonMsg: function(){
+          return this.isSaving ? '正在保存' : '保存所有';
+        }
       },
 
       created: function(){
         var that = this;
-        var currentUser = AV.User.current();
-        if(currentUser){
-          currentUser.isAuthenticated().then(function(authenticated){
-            that.signIned = true;
-            that.username = currentUser.attributes.username;
-            that.emailValidated = currentUser.attributes.emailValidated;
-          }, function(error){
-            console.log('SessionToken expired');
-            that.signIned = false;
-          });
-        }
-        else {
-          that.signIned = false;
-        }
+        this.isUserAuthenticated().then(function(){
+          var currentUser = AV.User.current();
+          that.initSignInUser(currentUser);
+          that.initUserData(currentUser);
+        }, function(error){
+          console.log(error);
+        }).catch(console.log.bind(console));
       },
 
       mounted: function(){
@@ -860,6 +865,16 @@
           this.scenes[index]['charactors'] = charactors;
         },
 
+        isUserAuthenticated: function(){
+          var currentUser = AV.User.current();
+          if(currentUser){
+            return currentUser.isAuthenticated();
+          }
+          else {
+            return Promise.reject(new Error('no currentUser'));
+          }
+        },
+
         signUp: function(e){
           var that = this;
           e.preventDefault();
@@ -885,7 +900,7 @@
           }, function (error) {
             that.signUpErrorMsg = that.errorMap[error.code];
             console.log(error);
-          });
+          }).catch(console.log.bind(console));
         },
 
         signInFromModal: function(e){
@@ -894,26 +909,82 @@
           var username = this.$refs.signInUserName.value;
           var password = this.$refs.signInPassword.value;
           this.signIn(username, password).then(function(loginedUser){
+            that.initSignInUser(loginedUser);
+            that.initUserData(loginedUser);
             that.showSignInModal = false;
-            that.signIned = true;
-            that.username = loginedUser.attributes.username;
             that.signInErrorMsg = '';
           }, function(error){
             that.signInErrorMsg = that.errorMap[error.code];
-//            console.log(error);
-          });
+            console.log(error);
+          }).catch(console.log.bind(console));
         },
 
         signIn: function(username, password){
           return AV.User.logIn(username, password);
         },
+        initSignInUser: function(currentUser){
+          this.userId = currentUser.id;
+          this.username = currentUser.attributes.username;
+          this.emailValidated = currentUser.attributes.emailValidated;
+        },
+        initUserData: function(currentUser){
+          var that = this;
+          var query = new AV.Query('SnowFlake');
+          query.equalTo('dependent', currentUser);
+          query.find().then(function (snowFlakes) {
+            var snowFlake = snowFlakes[0];
+            that.snowFlakeId = snowFlake.id;
+            that.steps = snowFlake.get('steps');
+            that.scenes = snowFlake.get('scenes');
+            that.charactors = snowFlake.get('charactors');
+          }, function(error){
+            //TODO object not found
+            if( 101 == error.code ) {
+              var snowFlake = new AV.Object('SnowFlake');
+              snowFlake.set('dependent', currentUser);
+              snowFlake.set('steps', that.steps);
+              snowFlake.set('scenes', that.scenes);
+              snowFlake.set('charactors', that.charactors);
+              snowFlake.save().then(function (snowFlake) {
+                that.snowFlakeId = snowFlake.id;
+              });
+            }
+          }).catch(console.log.bind(console));
+
+        },
+
+        saveAll: function(){
+          var that = this;
+          this.isUserAuthenticated().then(function(){
+            if(that.isSaving){
+              return;
+            }
+            var snowFlake = AV.Object.createWithoutData('SnowFlake', that.snowFlakeId);
+            snowFlake.set('steps', that.steps);
+            snowFlake.set('scenes', that.scenes);
+            snowFlake.set('charactors', that.charactors);
+            that.isSaving = true;
+            snowFlake.save().then(function(resp){
+              that.isSaving = false;
+              window.alert('保存成功');
+            }, function(error){
+              console.error(error);
+              that.isSaving = false;
+              window.alert('保存失败');
+            });
+          }, function(){
+            that.signInErrorMsg = '会话过期，请先登录！';
+            that.showSignInModal = true;
+          }).catch(console.log.bind(console));
+        },
 
         logOut: function(){
           var that = this;
           AV.User.logOut().then(function(){
-            that.signIned = false;
+            that.userId = null;
             that.username = '';
-          })
+            window.location.reload(true);
+          }).catch(console.log.bind(console));
         }
       }
     });
