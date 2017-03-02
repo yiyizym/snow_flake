@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src='js/idkey.js'></script>
   <script src='js/vue.js'></script>
   <script src="js/bluebird.min.js"></script>
   <script src="//cdn1.lncld.net/static/js/2.1.0/av-min.js"></script>
@@ -132,13 +133,13 @@
         default content
       -->
       <h3 slot="header">登录</h3>
-      <p>{{signInErrorMsg}}</p>
       <form slot="body" class="pure-form pure-form-stacked" v-on:submit.prevent="signInFromModal">
+        <p>{{signInErrorMsg}}</p>
         <label>邮箱：<input required type="email" ref="signInUserName" ></label>
         <label>密码：<input required type="password" ref="signInPassword" ></label>
         <div class="pure-controls">
           <button type="submit" class="pure-button pure-button-primary" >确定</button>
-          <button class="pure-button" @click="showSignInModal = false">取消</button>
+          <button type="button" class="pure-button" @click="showSignInModal = false">取消</button>
         </div>
       </form>
       <div slot="footer"></div>
@@ -433,18 +434,10 @@
 
   <script>
 
-    //TODO 上传到 github 前清空 APP_ID APP_KEY ！！！
-    // 应用 ID，用来识别应用
-    var APP_ID = '4MmuGlyNwSLaoAO721uk44LE-gzGzoHsz';
-
-    // 应用 Key，用来校验权限（Web 端可以配置安全域名来保护数据安全）
-    var APP_KEY = 's3MkeSLJ6bNfIquA008ir7Sv';
-    //TODO 上传到 github 前清空 APP_ID APP_KEY ！！！
-
     // 初始化
     AV.init({
-      appId: APP_ID,
-      appKey: APP_KEY
+      appId: window.APP_ID,
+      appKey: window.APP_KEY
     });
 
     // 浏览器的 Console 中设置 localStorage
@@ -878,10 +871,10 @@
         signUp: function(e){
           var that = this;
           e.preventDefault();
-          debugger
 
           that.signUpUser().then(function (loginedUser) {
             that.initSignInUser(loginedUser);
+            this.signUped = true;
             that.signUpErrorMsg = '';
           }, function (error) {
             that.signUpErrorMsg = that.errorMap[error.code];
@@ -926,7 +919,7 @@
         },
 
         initSignInUser: function(currentUser){
-          this.signUped = true;
+
           this.userId = currentUser.id;
           this.username = currentUser.attributes.username;
           this.emailValidated = currentUser.attributes.emailValidated;
