@@ -435,10 +435,10 @@
 
     //TODO 上传到 github 前清空 APP_ID APP_KEY ！！！
     // 应用 ID，用来识别应用
-    var APP_ID = '';
+    var APP_ID = '4MmuGlyNwSLaoAO721uk44LE-gzGzoHsz';
 
     // 应用 Key，用来校验权限（Web 端可以配置安全域名来保护数据安全）
-    var APP_KEY = '';
+    var APP_KEY = 's3MkeSLJ6bNfIquA008ir7Sv';
     //TODO 上传到 github 前清空 APP_ID APP_KEY ！！！
 
     // 初始化
@@ -878,9 +878,21 @@
         signUp: function(e){
           var that = this;
           e.preventDefault();
+          debugger
+
+          that.signUpUser().then(function (loginedUser) {
+            that.initSignInUser(loginedUser);
+            that.signUpErrorMsg = '';
+          }, function (error) {
+            that.signUpErrorMsg = that.errorMap[error.code];
+            console.log(error);
+          }).catch(console.log.bind(console));
+        },
+
+        signUpUser: function(){
           var username = this.$refs.signUpUsername.value;
           var password = this.$refs.signUpPassword.value;
-          
+
           // 新建 AVUser 对象实例
           var user = new AV.User();
           // 设置用户名
@@ -890,17 +902,7 @@
           // 设置密码
           user.setPassword(password);
 
-          user.signUp().then(function (loginedUser) {
-
-            that.signUped = true;
-            that.emailValidated = loginedUser.attributes.emailVerified;
-            that.username = loginedUser.attributes.username;
-            that.signUpErrorMsg = '';
-
-          }, function (error) {
-            that.signUpErrorMsg = that.errorMap[error.code];
-            console.log(error);
-          }).catch(console.log.bind(console));
+          return user.signUp();
         },
 
         signInFromModal: function(e){
@@ -922,60 +924,82 @@
         signIn: function(username, password){
           return AV.User.logIn(username, password);
         },
+
         initSignInUser: function(currentUser){
+          this.signUped = true;
           this.userId = currentUser.id;
           this.username = currentUser.attributes.username;
           this.emailValidated = currentUser.attributes.emailValidated;
         },
+
         initUserData: function(currentUser){
           var that = this;
+          that.getFirstSnowFlake(currentUser)
+            .then(that.setSnowFlake, function(error){
+              that.createAndSaveSnowFlake(error, currentUser);
+            })
+            .catch(console.log.bind(console));
+        },
+
+        getFirstSnowFlake: function(currentUser){
           var query = new AV.Query('SnowFlake');
           query.equalTo('dependent', currentUser);
-          query.find().then(function (snowFlakes) {
-            var snowFlake = snowFlakes[0];
-            that.snowFlakeId = snowFlake.id;
-            that.steps = snowFlake.get('steps');
-            that.scenes = snowFlake.get('scenes');
-            that.charactors = snowFlake.get('charactors');
-          }, function(error){
-            //TODO object not found
-            if( 101 == error.code ) {
-              var snowFlake = new AV.Object('SnowFlake');
-              snowFlake.set('dependent', currentUser);
-              snowFlake.set('steps', that.steps);
-              snowFlake.set('scenes', that.scenes);
-              snowFlake.set('charactors', that.charactors);
-              snowFlake.save().then(function (snowFlake) {
-                that.snowFlakeId = snowFlake.id;
-              });
-            }
-          }).catch(console.log.bind(console));
+          return query.first();
+        },
 
+        setSnowFlake: function(snowFlake){
+          this.snowFlakeId = snowFlake.id;
+          this.steps = snowFlake.get('steps');
+          this.scenes = snowFlake.get('scenes');
+          this.charactors = snowFlake.get('charactors');
+        },
+
+        createAndSaveSnowFlake: function (error, currentUser) {
+          var that = this;
+          //TODO object not found
+          if( 101 == error.code ) {
+            var snowFlake = new AV.Object('SnowFlake');
+            snowFlake.set('dependent', currentUser);
+            snowFlake.set('steps', that.steps);
+            snowFlake.set('scenes', that.scenes);
+            snowFlake.set('charactors', that.charactors);
+            snowFlake.save().then(function (snowFlake) {
+              that.snowFlakeId = snowFlake.id;
+            });
+          }
         },
 
         saveAll: function(){
           var that = this;
           this.isUserAuthenticated().then(function(){
-            if(that.isSaving){
-              return;
-            }
-            var snowFlake = AV.Object.createWithoutData('SnowFlake', that.snowFlakeId);
-            snowFlake.set('steps', that.steps);
-            snowFlake.set('scenes', that.scenes);
-            snowFlake.set('charactors', that.charactors);
-            that.isSaving = true;
-            snowFlake.save().then(function(resp){
-              that.isSaving = false;
-              window.alert('保存成功');
-            }, function(error){
-              console.error(error);
-              that.isSaving = false;
-              window.alert('保存失败');
-            });
+            that.saveSnowFlake();
           }, function(){
             that.signInErrorMsg = '会话过期，请先登录！';
             that.showSignInModal = true;
           }).catch(console.log.bind(console));
+        },
+
+        saveSnowFlake: function(){
+          var that = this;
+          if(this.isSaving){
+            return;
+          }
+          else{
+            this.isSaving = true;
+          }
+          var snowFlake = AV.Object.createWithoutData('SnowFlake', this.snowFlakeId);
+          snowFlake.set('steps', this.steps);
+          snowFlake.set('scenes', this.scenes);
+          snowFlake.set('charactors', this.charactors);
+          snowFlake.save()
+            .then(function(resp){
+              window.alert('保存成功');
+            }, function(error){
+              console.error(error);
+              window.alert('保存失败');
+            }).then(function(){
+              that.isSaving = false;
+          });
         },
 
         logOut: function(){
