@@ -446,7 +446,7 @@
     });
 
     // 浏览器的 Console 中设置 localStorage
-    localStorage.setItem('debug', 'leancloud*');
+//    localStorage.setItem('debug', 'leancloud*');
 
 
 
@@ -782,7 +782,7 @@
       },
       computed: {
         signIned: function(){
-          return this.userId != null;
+          return (this.userId != null) && this.emailValidated != false;
         },
         saveButtonMsg: function(){
           return this.isSaving ? '正在保存' : '保存所有';
@@ -891,7 +891,7 @@
 
           that.signUpUser().then(function (loginedUser) {
             that.initSignInUser(loginedUser);
-            this.signUped = true;
+            that.signUped = true;
             that.signUpErrorMsg = '';
           }, function (error) {
             that.signUpErrorMsg = that.errorMap[error.code];
@@ -917,7 +917,6 @@
 
         signInFromModal: function(e){
           var that = this;
-          e.preventDefault();
           var username = this.$refs.signInUserName.value;
           var password = this.$refs.signInPassword.value;
           this.signIn(username, password).then(function(loginedUser){
@@ -936,10 +935,9 @@
         },
 
         initSignInUser: function(currentUser){
-
+          this.emailValidated = currentUser.attributes.emailValidated;
           this.userId = currentUser.id;
           this.username = currentUser.attributes.username;
-          this.emailValidated = currentUser.attributes.emailValidated;
         },
 
         initUserData: function(currentUser){
@@ -954,7 +952,14 @@
         getFirstSnowFlake: function(currentUser){
           var query = new AV.Query('SnowFlake');
           query.equalTo('dependent', currentUser);
-          return query.first();
+          return query.first().then(function(snowFlake){
+            if(snowFlake === undefined){
+              return Promise.reject(new Error('have no snowFlake'));
+            }
+            else{
+              return Promise.resolve(snowFlake);
+            }
+          });
         },
 
         setSnowFlake: function(snowFlake){
@@ -966,17 +971,14 @@
 
         createAndSaveSnowFlake: function (error, currentUser) {
           var that = this;
-          //TODO object not found
-          if( 101 == error.code ) {
-            var snowFlake = new AV.Object('SnowFlake');
-            snowFlake.set('dependent', currentUser);
-            snowFlake.set('steps', that.steps);
-            snowFlake.set('scenes', that.scenes);
-            snowFlake.set('charactors', that.charactors);
-            snowFlake.save().then(function (snowFlake) {
-              that.snowFlakeId = snowFlake.id;
-            });
-          }
+          var snowFlake = new AV.Object('SnowFlake');
+          snowFlake.set('dependent', currentUser);
+          snowFlake.set('steps', that.steps);
+          snowFlake.set('scenes', that.scenes);
+          snowFlake.set('charactors', that.charactors);
+          snowFlake.save().then(function (snowFlake) {
+            that.snowFlakeId = snowFlake.id;
+          });
         },
 
         saveAll: function(){
