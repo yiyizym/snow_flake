@@ -100,10 +100,6 @@
 
 
     <modal v-if="showSignUpModal">
-      <!--
-        you can use custom content here to overwrite
-        default content
-      -->
       <h3 slot="header">注册</h3>
       <div slot="body">
         <template v-if="signUped && !emailValidated">
@@ -111,12 +107,12 @@
           <button class="pure-button pure-button-primary" @click="showSignUpModal = false;showSignInModal = true;">我已验证邮箱，登录</button>
         </template>
         <template v-else>
-          <form class="pure-form pure-form-stacked" v-on:submit.prevent="signUp">
+          <form class="pure-form pure-form-stacked" @submit.prevent="signUp">
             <label>邮箱：<input required type="email" ref="signUpUsername"></label>
             <label>密码：<input required type="password" ref="signUpPassword"></label>
             <div class="pure-controls">
               <button type="submit" class="pure-button pure-button-primary" >确定</button>
-              <button class="pure-button" @click="showSignUpModal = false">取消</button>
+              <button type="button" class="pure-button" @click="showSignUpModal = false">取消</button>
             </div>
           </form>
         </template>
@@ -128,20 +124,18 @@
     </modal>
 
     <modal v-if="showSignInModal">
-      <!--
-        you can use custom content here to overwrite
-        default content
-      -->
       <h3 slot="header">登录</h3>
-      <form slot="body" class="pure-form pure-form-stacked" v-on:submit.prevent="signInFromModal">
-        <p>{{signInErrorMsg}}</p>
-        <label>邮箱：<input required type="email" ref="signInUserName" ></label>
-        <label>密码：<input required type="password" ref="signInPassword" ></label>
-        <div class="pure-controls">
-          <button type="submit" class="pure-button pure-button-primary" >确定</button>
-          <button type="button" class="pure-button" @click="showSignInModal = false">取消</button>
-        </div>
-      </form>
+      <template slot="body">
+          <form class="pure-form pure-form-stacked" @submit.prevent="signInFromModal">
+            <label>{{signInErrorMsg}}</label>
+            <label>邮箱：<input required type="email" ref="signInUserName" ></label>
+            <label>密码：<input required type="password" ref="signInPassword" ></label>
+            <div class="pure-controls">
+              <button type="submit" class="pure-button pure-button-primary" >确定</button>
+              <button type="button" class="pure-button" @click="showSignInModal = false">取消</button>
+            </div>
+          </form>
+      </template>
       <div slot="footer"></div>
     </modal>
 
@@ -205,6 +199,17 @@
         :scenes="scenes"
       ></scenes-detail>
     </form>
+  </script>
+
+
+  <script type="x-template" id="about">
+    <div>
+      <h2 class="content-subhead">雪花分形*写作小应用</h2>
+      <p>这是一个基于雪花分形理论的写作小应用，<strong>免费注册登录</strong>后可以保存你的作品。</p>
+      <p>关于雪花分形理论，英语好的朋友请看原创作者的<a href="http://www.advancedfictionwriting.com/articles/snowflake-method/">介绍</a>，也可以看本人粗浅的<a href="https://judes.me/life/2016/11/07/snowflake-method.html">理解和总结</a>。</p>
+      <p>若有其他疑问，欢迎发<a href="mailto:yiyizym@163.com">邮件</a>给我 ^_^ </p>
+      <i>致程序员们，本应用所有代码都开源，托管在 <a href="https://github.com/yiyizym/snow_flake">github</a> 上。前台使用 vuejs ，后台使用 leancloud .</i>
+    </div>
   </script>
 
 
@@ -390,7 +395,7 @@
           <a class="pure-menu-heading" href="#">步骤</a>
           <ul class="pure-menu-list">
             <li class="pure-menu-item" v-for="(step, index) in steps">
-              <a @click="$emit('selected', index)" :class="{ selected : selected == index }" href="#" class="pure-menu-link">第 {{ index + 1 }} 步</a>
+              <a @click="$emit('selected', index)" :class="{ selected : selected == index }" href="#" class="pure-menu-link">{{getDesc(step, index)}}</a>
             </li>
           </ul>
         </div>
@@ -447,7 +452,12 @@
 
     Vue.component('side-nav', {
       props: ['steps', 'selected', 'isactive'],
-      template: '#side-nav'
+      template: '#side-nav',
+      methods: {
+        getDesc: function(step, index){
+          return step.name == 'about' ? '关于' : '第 ' + (index + 1) + '步';
+        }
+      }
     });
 
     Vue.component('hint', {
@@ -674,6 +684,9 @@
               }
             }
           }
+        },
+        about: {
+          template: '#about'
         }
       },
       data: {
@@ -741,6 +754,10 @@
 //            supplement: ''
 //          }
 //        }
+          ,{
+            name: 'about',
+            former: -1
+          }
 ],
         selected: 0,
         isactive: false,
