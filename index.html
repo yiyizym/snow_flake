@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src='js/idkey.js'></script>
   <script src='js/vue.js'></script>
+  <script src='config/locale.js'></script>
   <script src="js/bluebird.min.js"></script>
   <script src="//cdn1.lncld.net/static/js/2.1.0/av-min.js"></script>
   <title>snow flake, help you write better stories</title>
@@ -68,18 +69,19 @@
 
   <div id="app">
     <div id="layout" :class="{active: isactive}">
-      <side-nav :steps="steps" :selected="selected" :isactive="isactive" @selected="setSelected" @togglemenu="togglemenu"></side-nav>
+      <side-nav :steps="steps" :selected="selected" :isactive="isactive" :currentlanguage="currentLanguage" @selected="setSelected" @togglemenu="togglemenu"></side-nav>
       <div id="main">
         <div class="header">
           <template v-if="signIned">
-            <span>你好，{{ username }}</span>
-            <button class="pure-button " @click="logOut">登出</button>
+            <span>{{i18n('greeting')}}{{ username }}</span>
+            <button class="pure-button " @click="logOut">{{i18n('logOut')}}</button>
             <button class="pure-button pure-button-primary" @click="saveAll">{{saveButtonMsg}}</button>
           </template>
           <template v-else>
-            <button class="pure-button pure-button-primary" @click="showSignUpModal = true">注册</button>
-            <button class="pure-button pure-button-primary" @click="showSignInModal = true">登录</button>
+            <button class="pure-button pure-button-primary" @click="showSignUpModal = true">{{i18n('signUp')}}</button>
+            <button class="pure-button pure-button-primary" @click="showSignInModal = true">{{i18n('signIn')}}</button>
           </template>
+          <a href="javascript:void(0)" style="float: right;" @click="toggleLanguage">{{optionalLanguage}}</a>
         </div>
         <div class="content">
           <div class="sec" v-for="(step, index) of steps" v-show="index == selected" :key="index">
@@ -100,19 +102,19 @@
 
 
     <modal v-if="showSignUpModal">
-      <h3 slot="header">注册</h3>
+      <h3 slot="header">{{i18n('signUp')}}</h3>
       <div slot="body">
         <template v-if="signUped && !emailValidated">
-          <p>请验证邮箱，验证成功后点击“我已验证邮箱，登录”按钮</p>
-          <button class="pure-button pure-button-primary" @click="showSignUpModal = false;showSignInModal = true;">我已验证邮箱，登录</button>
+          <p>{{i18n('validateEmailMsg')}}</p>
+          <button class="pure-button pure-button-primary" @click="showSignUpModal = false;showSignInModal = true;">{{i18n('validatedLogInMsg')}}</button>
         </template>
         <template v-else>
           <form class="pure-form pure-form-stacked" @submit.prevent="signUp">
-            <label>邮箱：<input required type="email" ref="signUpUsername"></label>
-            <label>密码：<input required type="password" ref="signUpPassword"></label>
+            <label>{{i18n('email')}}：<input required type="email" ref="signUpUsername"></label>
+            <label>{{i18n('pwd')}}：<input required type="password" ref="signUpPassword"></label>
             <div class="pure-controls">
-              <button type="submit" class="pure-button pure-button-primary" >确定</button>
-              <button type="button" class="pure-button" @click="showSignUpModal = false">取消</button>
+              <button type="submit" class="pure-button pure-button-primary" >{{i18n('confirm')}}</button>
+              <button type="button" class="pure-button" @click="showSignUpModal = false">{{i18n('cancel')}}</button>
             </div>
           </form>
         </template>
@@ -124,15 +126,15 @@
     </modal>
 
     <modal v-if="showSignInModal">
-      <h3 slot="header">登录</h3>
+      <h3 slot="header">{{i18n('signIn')}}</h3>
       <template slot="body">
           <form class="pure-form pure-form-stacked" @submit.prevent="signInFromModal">
             <label>{{signInErrorMsg}}</label>
-            <label>邮箱：<input required type="email" ref="signInUserName" ></label>
-            <label>密码：<input required type="password" ref="signInPassword" ></label>
+            <label>{{i18n('email')}}：<input required type="email" ref="signInUserName" ></label>
+            <label>{{i18n('pwd')}}：<input required type="password" ref="signInPassword" ></label>
             <div class="pure-controls">
-              <button type="submit" class="pure-button pure-button-primary" >确定</button>
-              <button type="button" class="pure-button" @click="showSignInModal = false">取消</button>
+              <button type="submit" class="pure-button pure-button-primary" >{{i18n('confirm')}}</button>
+              <button type="button" class="pure-button" @click="showSignInModal = false">{{i18n('cancel')}}</button>
             </div>
           </form>
       </template>
@@ -392,7 +394,7 @@
       </a>
       <div id="menu" :class="{'active': isactive}">
         <div class="pure-menu">
-          <a class="pure-menu-heading" href="#">步骤</a>
+          <a class="pure-menu-heading" href="#">{{this.$root.i18n('steps')}}</a>
           <ul class="pure-menu-list">
             <li class="pure-menu-item" v-for="(step, index) in steps">
               <a @click="$emit('selected', index)" :class="{ selected : selected == index }" href="#" class="pure-menu-link">{{getDesc(step, index)}}</a>
@@ -451,11 +453,16 @@
 
 
     Vue.component('side-nav', {
-      props: ['steps', 'selected', 'isactive'],
+      props: ['steps', 'selected', 'isactive', 'currentlanguage'],
       template: '#side-nav',
       methods: {
         getDesc: function(step, index){
-          return step.name == 'about' ? '关于' : '第 ' + (index + 1) + '步';
+          if(this.currentlanguage === 'zh'){
+            return step.name == 'about' ? '关于' : '第 ' + (index + 1) + ' 步';
+          }
+          else {
+            return step.name == 'about' ? 'about' : 'step ' + (index + 1) ;
+          }
         }
       }
     });
@@ -690,6 +697,7 @@
         }
       },
       data: {
+        currentLanguage: 'zh',
         charactors: [{
           name: '',
           type: 'major',
@@ -778,14 +786,17 @@
         },
         signUped: false,
         userId: null,
-        username: ''
+        username: '',
       },
       computed: {
         signIned: function(){
           return (this.userId != null) && this.emailValidated != false;
         },
         saveButtonMsg: function(){
-          return this.isSaving ? '正在保存' : '保存所有';
+          return this.isSaving ? this.i18n('saving'): this.i18n('saveAll');
+        },
+        optionalLanguage: function(){
+          return this.i18n('optionalLanguage');
         }
       },
 
@@ -986,7 +997,7 @@
           this.isUserAuthenticated().then(function(){
             that.saveSnowFlake();
           }, function(){
-            that.signInErrorMsg = '会话过期，请先登录！';
+            that.signInErrorMsg = that.i18n('sessionTimeout');
             that.showSignInModal = true;
           }).catch(console.log.bind(console));
         },
@@ -1005,10 +1016,10 @@
           snowFlake.set('charactors', this.charactors);
           snowFlake.save()
             .then(function(resp){
-              window.alert('保存成功');
+              window.alert(that.i18n('saved'));
             }, function(error){
               console.error(error);
-              window.alert('保存失败');
+              window.alert(that.i18n('savedFailed'));
             }).then(function(){
               that.isSaving = false;
           });
@@ -1021,6 +1032,14 @@
             that.username = '';
             window.location.reload(true);
           }).catch(console.log.bind(console));
+        },
+
+        toggleLanguage: function(){
+          this.currentLanguage = this.currentLanguage === 'zh' ? 'en' : 'zh';
+        },
+
+        i18n: function(words){
+          return window.LANGUAGE[this.currentLanguage][words];
         }
       }
     });
